@@ -1,205 +1,213 @@
-import React, { useState } from 'react';
-import { Menu, Search, Plus, Bell, Sun, Moon, Flame, ChevronRight } from 'lucide-react';
+import React from 'react';
+import { Menu, Search, Plus, Bell, Sun, Moon } from 'lucide-react';
 import Avatar from '../ui/Avatar';
-import ThemePicker from '../ui/ThemePicker';
 
 export default function TopNav({
   searchValue,
   onSearchChange,
   onOpenSidebarDrawer,
   onOpenNewTaskModal,
-  onOpenShortcutsModal,
   onOpenCommandPalette,
   searchInputRef,
-  theme = 'obsidian',
-  themeName,
-  themes,
-  setTheme,
-  isSystem,
+  isDark,
+  toggleTheme,
   tasks = []
 }) {
-  const [showThemePicker, setShowThemePicker] = useState(false);
-
-  // Check if any task is blocked for the notification unread badge dot
   const hasUnread = tasks.some(t => t.status === 'blocked');
 
-  // Determine active theme icon
-  const themeIcons = {
-    obsidian: Moon,
-    arctic: Sun,
-    midnight: Moon,
-    ember: Flame
-  };
-  const ThemeIcon = themeIcons[theme] || Moon;
-
   const handleKeyDown = (e) => {
-    if (e.key === 'Escape') {
-      searchInputRef.current?.blur();
-    }
+    if (e.key === 'Escape') searchInputRef.current?.blur();
   };
 
   return (
-    <header className="h-13 px-3 md:px-6 gap-2 md:gap-3 flex items-center sticky top-0 z-45 bg-ff-elevated/90 backdrop-blur-md border-b border-ff-border shrink-0 select-none">
-      
-      {/* ========================================================================= */}
-      {/* MOBILE LAYOUT (< 768px)                                                   */}
-      {/* ========================================================================= */}
-      <div className="flex md:hidden items-center justify-between w-full gap-2">
-        
-        {/* Zone A — LEFT (flex-shrink-0) */}
-        <button 
-          onClick={onOpenSidebarDrawer}
+    <header
+      className="h-14 flex items-center px-3 md:px-5 gap-2 shrink-0 border-b z-40 sticky top-0"
+      style={{
+        background:   'var(--bg-elevated)',
+        borderColor:  'var(--bg-border)',
+        backdropFilter: 'blur(12px)',
+      }}
+    >
+
+      {/* ═══════════════════════════════════════════════════════ */}
+      {/*  MOBILE  <768px — hamburger | search | actions          */}
+      {/* ═══════════════════════════════════════════════════════ */}
+      <div className="flex md:hidden items-center w-full gap-2">
+
+        {/* Zone A — hamburger */}
+        <button
           type="button"
-          className="flex items-center justify-center w-8 h-8 rounded-lg text-ff-muted hover:text-ff-primary hover:bg-ff-hover transition-colors flex-shrink-0 cursor-pointer"
+          onClick={onOpenSidebarDrawer}
+          aria-label="Open navigation"
+          className="shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-colors cursor-pointer"
+          style={{ color: 'var(--text-muted)' }}
         >
           <Menu size={18} />
         </button>
 
-        {/* Zone B — CENTER (flex-1, min-width-0) */}
+        {/* Zone B — search, flex-1 */}
         <div className="flex-1 min-w-0 relative">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-ff-muted/65" size={13} />
+          <Search
+            size={13}
+            className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
+            style={{ color: 'var(--text-muted)' }}
+          />
           <input
             ref={searchInputRef}
             type="text"
             value={searchValue}
             onChange={e => onSearchChange(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="w-full h-8 bg-ff-hover/60 border border-ff-border rounded-lg pl-8 pr-3 text-xs text-ff-primary placeholder:text-ff-muted focus:outline-none focus:border-ff-accent/60 transition-colors"
             placeholder="Search tasks..."
+            className="w-full h-8 rounded-lg pl-8 pr-3 text-xs border outline-none transition-colors"
+            style={{
+              background:   'var(--bg-hover)',
+              borderColor:  'var(--bg-border)',
+              color:        'var(--text-primary)',
+            }}
           />
         </div>
 
-        {/* Zone C — RIGHT (flex-shrink-0, flex items-center gap-1) */}
-        <div className="flex-shrink-0 flex items-center gap-1 relative">
-          {/* 1. Theme toggle button */}
+        {/* Zone C — actions, shrink-0 */}
+        <div className="shrink-0 flex items-center gap-1">
+
+          {/* Dark / Light toggle — VISIBLE, LABELED */}
           <button
             type="button"
-            onClick={() => setShowThemePicker(p => !p)}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-ff-muted hover:text-ff-primary hover:bg-ff-hover transition-colors cursor-pointer"
+            onClick={toggleTheme}
+            aria-label="Toggle theme"
+            className="flex items-center gap-1 h-8 px-2.5 rounded-lg border text-[11px] font-semibold transition-all duration-200 cursor-pointer shrink-0 active:scale-95"
+            style={{
+              background:  'var(--bg-card)',
+              borderColor: 'var(--bg-border)',
+              color:       'var(--text-secondary)',
+            }}
           >
-            <ThemeIcon size={16} />
+            {isDark
+              ? <><Sun  size={12} className="text-amber-400 shrink-0" /><span className="hidden xs:inline">Light</span></>
+              : <><Moon size={12} style={{ color: 'var(--accent)' }} className="shrink-0" /><span className="hidden xs:inline">Dark</span></>
+            }
           </button>
 
-          {/* 2. Notification bell button */}
-          <button
-            type="button"
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-ff-muted hover:text-ff-primary hover:bg-ff-hover relative transition-colors cursor-pointer"
-          >
-            <Bell size={16} />
-            {hasUnread && (
-              <span className="w-1.5 h-1.5 absolute top-2 right-2 bg-red-500 rounded-full shadow" />
-            )}
-          </button>
-
-          {/* 3. New Task button — ICON ONLY on mobile */}
+          {/* New task */}
           <button
             type="button"
             onClick={onOpenNewTaskModal}
-            className="w-8 h-8 bg-ff-accent hover:bg-ff-accent/80 rounded-lg flex items-center justify-center text-white flex-shrink-0 cursor-pointer active:scale-95 transition-all duration-150"
+            aria-label="Create new task"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-white transition-all duration-150 cursor-pointer active:scale-95 shrink-0"
+            style={{ background: 'var(--accent)' }}
           >
-            <Plus size={16} />
+            <Plus size={16} strokeWidth={2.5} />
           </button>
-
-          {showThemePicker && (
-            <ThemePicker
-              themes={themes}
-              theme={theme}
-              setTheme={setTheme}
-              isSystem={isSystem}
-              onClose={() => setShowThemePicker(false)}
-            />
-          )}
         </div>
-
       </div>
 
-      {/* ========================================================================= */}
-      {/* DESKTOP LAYOUT (>= 768px)                                                 */}
-      {/* ========================================================================= */}
-      <div className="hidden md:flex items-center justify-between w-full">
-        
+      {/* ═══════════════════════════════════════════════════════ */}
+      {/*  DESKTOP  ≥768px — breadcrumb | search + controls      */}
+      {/* ═══════════════════════════════════════════════════════ */}
+      <div className="hidden md:flex items-center w-full gap-4">
+
         {/* Left: breadcrumb */}
-        <div className="flex items-center gap-2 select-none text-xs">
-          <span className="text-ff-muted font-bold uppercase tracking-wider text-[10px]">
+        <div className="flex items-center gap-2 select-none shrink-0">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" className="shrink-0">
+            <path d="M4 2H14V6H8V9H12V13H8V18H4Z" fill="var(--accent)" />
+            <path d="M10 5H18V9H13V12H16V15H13V18H10Z" fill="var(--accent)" fillOpacity="0.55" />
+          </svg>
+          <span className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
             FilterFlow
           </span>
-          <ChevronRight size={11} className="text-ff-muted/60" />
-          <span className="text-ff-primary font-semibold">
+          <span className="text-xs" style={{ color: 'var(--text-muted)' }}>›</span>
+          <span className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
             Active Workspace
           </span>
         </div>
 
-        {/* Center: spacing */}
+        {/* Spacer */}
         <div className="flex-1" />
 
-        {/* Right side controls */}
-        <div className="flex items-center gap-3 relative shrink-0">
-          
-          {/* Desktop TopNav Search Area */}
-          <div className="relative flex items-center w-48">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-ff-muted/65" size={13} />
+        {/* Right controls */}
+        <div className="flex items-center gap-2 shrink-0">
+
+          {/* Search bar */}
+          <div className="relative flex items-center">
+            <Search size={13} className="absolute left-3 pointer-events-none" style={{ color: 'var(--text-muted)' }} />
             <input
               type="text"
               value={searchValue}
               onChange={e => onSearchChange(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="w-full h-8 bg-ff-hover/60 border border-ff-border rounded-lg pl-8 pr-12 text-xs text-ff-primary placeholder:text-ff-muted focus:outline-none focus:border-ff-accent/60 transition-colors"
               placeholder="Search..."
+              className="h-8 w-48 rounded-lg pl-8 pr-10 text-xs border outline-none transition-colors"
+              style={{
+                background:  'var(--bg-hover)',
+                borderColor: 'var(--bg-border)',
+                color:       'var(--text-primary)',
+              }}
             />
-            {/* ⌘K Badge acting as shortcut click trigger */}
+            {/* ⌘K badge */}
             <button
               type="button"
               onClick={onOpenCommandPalette}
-              className="absolute right-2 text-[9px] font-bold font-mono bg-ff-card border border-ff-border text-ff-muted px-1.5 py-0.5 rounded leading-none shrink-0 cursor-pointer hover:border-ff-accent hover:text-ff-primary transition-colors"
+              className="absolute right-2 text-[9px] font-mono font-bold px-1 py-0.5 rounded border leading-none cursor-pointer transition-colors"
+              style={{
+                background:  'var(--bg-card)',
+                borderColor: 'var(--bg-border)',
+                color:       'var(--text-muted)',
+              }}
             >
               ⌘K
             </button>
           </div>
 
-          {/* Theme Switcher Button */}
+          {/* ── DARK / LIGHT TOGGLE — prominent, labeled ── */}
           <button
             type="button"
-            onClick={() => setShowThemePicker(p => !p)}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-ff-muted hover:text-ff-primary hover:bg-ff-hover transition-colors cursor-pointer"
+            onClick={toggleTheme}
+            aria-label={isDark ? 'Switch to Light mode' : 'Switch to Dark mode'}
+            className="flex items-center gap-1.5 h-8 px-3 rounded-lg border text-xs font-semibold transition-all duration-200 cursor-pointer active:scale-95"
+            style={{
+              background:  'var(--bg-card)',
+              borderColor: 'var(--bg-border)',
+              color:       'var(--text-secondary)',
+            }}
           >
-            <ThemeIcon size={16} />
+            {isDark
+              ? <><Sun  size={13} className="text-amber-400" /><span>Light</span></>
+              : <><Moon size={13} style={{ color: 'var(--accent)' }} /><span>Dark</span></>
+            }
           </button>
 
-          {/* Notification bell button */}
+          {/* Bell */}
           <button
             type="button"
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-ff-muted hover:text-ff-primary hover:bg-ff-hover relative transition-colors cursor-pointer"
+            aria-label="Notifications"
+            className="relative w-8 h-8 rounded-lg flex items-center justify-center border transition-colors cursor-pointer"
+            style={{
+              background:  'var(--bg-card)',
+              borderColor: 'var(--bg-border)',
+              color:       'var(--text-muted)',
+            }}
           >
-            <Bell size={16} />
+            <Bell size={15} />
             {hasUnread && (
-              <span className="w-1.5 h-1.5 absolute top-2.5 right-2.5 bg-red-500 rounded-full shadow" />
+              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-red-500 rounded-full" />
             )}
           </button>
 
-          {/* User profile avatar */}
-          <Avatar initials="AJ" color="bg-ff-accent" size="xs" showTooltip={false} />
+          {/* Avatar */}
+          <Avatar initials="AJ" color="bg-violet-600" size="xs" showTooltip={false} />
 
-          {/* New Task Button with label */}
+          {/* New task */}
           <button
             type="button"
             onClick={onOpenNewTaskModal}
-            className="h-8 bg-ff-accent hover:bg-ff-accent/80 text-white text-xs font-semibold px-3.5 rounded-lg flex items-center gap-1.5 shadow active:scale-[0.98] transition-all duration-150 cursor-pointer"
+            className="flex items-center gap-1.5 h-8 px-3.5 rounded-lg text-xs font-semibold text-white transition-all duration-150 cursor-pointer active:scale-[0.97]"
+            style={{ background: 'var(--accent)' }}
           >
             <Plus size={14} strokeWidth={2.5} />
             <span>New Task</span>
           </button>
-
-          {showThemePicker && (
-            <ThemePicker
-              themes={themes}
-              theme={theme}
-              setTheme={setTheme}
-              isSystem={isSystem}
-              onClose={() => setShowThemePicker(false)}
-            />
-          )}
         </div>
-
       </div>
 
     </header>

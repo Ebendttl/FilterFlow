@@ -2,21 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── CSS Custom Properties ── */
+/* ── Default (Obsidian / Dark) CSS tokens ── */
 :root {
-  --bg-base:       #09090b;
-  --bg-elevated:   #111113;
-  --bg-card:       #18181b;
-  --bg-hover:      #27272a;
-  --bg-border:     #3f3f46;
-  --bg-muted:      #52525b;
-  --text-primary:  #fafafa;
-  --text-secondary:#a1a1aa;
-  --text-muted:    #71717a;
-  --accent-violet: #8b5cf6;
-  --accent-cyan:   #06b6d4;
-  --accent-glow:   rgba(139,92,246,0.15);
-  --cyan-glow:     rgba(6,182,212,0.12);
+  --bg-base:        #09090b;
+  --bg-elevated:    #111113;
+  --bg-card:        #18181b;
+  --bg-hover:       #27272a;
+  --bg-border:      #3f3f46;
+  --text-primary:   #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-muted:     #71717a;
+  --accent:         #8b5cf6;
+  --accent-cyan:    #06b6d4;
+  --accent-glow:    rgba(139, 92, 246, 0.15);
+  --cyan-glow:      rgba(6, 182, 212, 0.12);
+}
+
+/* ── Light (Arctic) override ── */
+:root[data-theme="arctic"] {
+  --bg-base:        #f8fafc;
+  --bg-elevated:    #ffffff;
+  --bg-card:        #f1f5f9;
+  --bg-hover:       #e2e8f0;
+  --bg-border:      #cbd5e1;
+  --text-primary:   #0f172a;
+  --text-secondary: #475569;
+  --text-muted:     #94a3b8;
+  --accent:         #6366f1;
+  --accent-cyan:    #0891b2;
+  --accent-glow:    rgba(99, 102, 241, 0.12);
+  --cyan-glow:      rgba(8, 145, 178, 0.10);
 }
 
 /* ── Base Reset ── */
@@ -37,26 +52,25 @@ body {
   overflow: hidden;
 }
 
+/* ── Custom Scrollbars — theme-aware ── */
+::-webkit-scrollbar              { width: 4px; height: 4px; }
+::-webkit-scrollbar-track        { background: transparent; }
+::-webkit-scrollbar-thumb        { background: var(--bg-border); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover  { background: var(--text-muted); }
+
 /* ── Dot Grid Background ── */
 .dot-grid-bg {
-  background-image: radial-gradient(circle, rgba(39, 39, 42, 0.5) 1px, transparent 1px);
+  background-image: radial-gradient(circle, var(--bg-border) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
-/* ── Custom Scrollbars ── */
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: #52525b; }
-
-/* ── Shimmer Animation ── */
+/* ── Shimmer animation ── */
 @keyframes shimmer {
-  0% { background-position: -400px 0; }
+  0%   { background-position: -400px 0; }
   100% { background-position: 400px 0; }
 }
-
 .shimmer {
-  background: linear-gradient(90deg, #18181b 25%, #27272a 50%, #18181b 75%);
+  background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-hover) 50%, var(--bg-card) 75%);
   background-size: 800px 100%;
   animation: shimmer 1.5s infinite;
 }
@@ -64,60 +78,54 @@ body {
 /* ── Bounce Dots (AI thinking) ── */
 @keyframes bounceDot {
   0%, 60%, 100% { transform: translateY(0); }
-  30% { transform: translateY(-6px); }
+  30%           { transform: translateY(-6px); }
 }
-
-.bounce-dot-1 { animation: bounceDot 1.2s ease-in-out infinite; }
+.bounce-dot-1 { animation: bounceDot 1.2s ease-in-out 0s   infinite; }
 .bounce-dot-2 { animation: bounceDot 1.2s ease-in-out 0.15s infinite; }
-.bounce-dot-3 { animation: bounceDot 1.2s ease-in-out 0.3s infinite; }
+.bounce-dot-3 { animation: bounceDot 1.2s ease-in-out 0.3s  infinite; }
 
-/* ── Focus Ring ── */
+/* ── New task flash highlight ── */
+@keyframes newTaskFlash {
+  0%   { background-color: rgba(139, 92, 246, 0.18); }
+  100% { background-color: transparent; }
+}
+.new-task-flash { animation: newTaskFlash 2s ease-out forwards; }
+
+/* ── Focus ring ── */
 .focus-ring:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--accent-violet);
+  box-shadow: 0 0 0 2px var(--accent);
 }
 
-/* ── AI Glow Border ── */
+/* ── AI glow border ── */
 .ai-glow {
   border-color: rgba(6, 182, 212, 0.2);
   box-shadow: 0 0 20px rgba(6, 182, 212, 0.04) inset;
 }
 
-/* ── Violet Active Glow ── */
-.violet-glow {
-  box-shadow: 0 0 0 2px var(--accent-violet);
+/* ── Violet active glow ── */
+.violet-glow { box-shadow: 0 0 0 2px var(--accent); }
+
+/* ── Drag-over state for board columns ── */
+.drag-over {
+  background-color: rgba(139, 92, 246, 0.1) !important;
+  border-color: rgba(139, 92, 246, 0.4) !important;
 }
 
-/* ── Gradient for new task highlight ── */
-@keyframes newTaskFlash {
-  0% { background-color: rgba(139, 92, 246, 0.2); }
-  100% { background-color: transparent; }
-}
-
-.new-task-flash {
-  animation: newTaskFlash 2s ease-out forwards;
-}
-
-/* ── Selection ── */
+/* ── Selection highlight ── */
 ::selection {
   background: rgba(139, 92, 246, 0.3);
   color: #fafafa;
 }
 
-/* ── Line clamp ── */
+/* ── No-scrollbar utility ── */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ── Line-clamp utility ── */
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-}
-
-/* ── No scrollbar (for horizontal scroll areas) ── */
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-/* ── Drag over state ── */
-.drag-over {
-  background-color: rgba(139, 92, 246, 0.1) !important;
-  border-color: rgba(139, 92, 246, 0.4) !important;
 }

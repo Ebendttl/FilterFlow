@@ -1,142 +1,101 @@
 import React from 'react';
-import { History, BookOpen, Activity, Sun, Moon, Monitor, Flame } from 'lucide-react';
+import { Sun, Moon } from 'lucide-react';
 
-export default function Footer({ tasks = [], currentTheme = 'obsidian', onOpenShortcuts }) {
-  const totalTasks = tasks.length;
-  const completedTasks = tasks.filter(t => t.status === 'done').length;
-  const blockedTasks = tasks.filter(t => t.status === 'blocked').length;
-
-  const themeIcons = {
-    obsidian: Moon,
-    arctic: Sun,
-    midnight: Moon,
-    ember: Flame
-  };
-  const ThemeIcon = themeIcons[currentTheme] || Moon;
-
-  const themeDisplayNames = {
-    obsidian: 'Obsidian',
-    arctic: 'Arctic',
-    midnight: 'Midnight',
-    ember: 'Ember'
-  };
-  const currentThemeName = themeDisplayNames[currentTheme] || 'Obsidian';
+export default function Footer({ tasks = [], isDark = true, toggleTheme }) {
+  const total     = tasks.length;
+  const done      = tasks.filter(t => t.status === 'done').length;
+  const blocked   = tasks.filter(t => t.status === 'blocked').length;
+  const inProgress = tasks.filter(t => t.status === 'in_progress').length;
 
   return (
-    <footer className="w-full shrink-0 border-t border-ff-border bg-ff-base select-none mt-auto">
-      {/* Desktop Footer (hidden on mobile, flex on md:) */}
-      <div className="hidden md:flex items-center justify-between px-6 py-5 flex-wrap gap-4">
-        {/* Left Section */}
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2">
-            <svg 
-              width="16" 
-              height="16" 
-              viewBox="0 0 20 20" 
-              fill="none" 
-              xmlns="http://www.w3.org/2000/svg"
-              className="shrink-0"
-            >
-              <path d="M4 2 H14 V6 H8 V9 H12 V13 H8 V18 H4 Z" fill="var(--accent)" />
-              <path d="M10 5 H18 V9 H13 V12 H16 V15 H13 V18 H10 Z" fill="var(--accent)" fillOpacity="0.6" />
-            </svg>
-            <span className="text-sm font-semibold text-ff-secondary">
-              FilterFlow
-            </span>
-            <span className="text-xs text-ff-muted font-mono ml-1">
-              v2.1.0
-            </span>
-          </div>
+    <footer
+      className="shrink-0 border-t select-none"
+      style={{
+        background:   'var(--bg-elevated)',
+        borderColor:  'var(--bg-border)',
+      }}
+    >
+      <div className="flex items-center justify-between px-5 py-2.5 gap-4 flex-wrap">
 
-          <span className="text-ff-muted/30 font-bold">·</span>
+        {/* ── Left: branding + live status ── */}
+        <div className="flex items-center gap-3 min-w-0">
+          {/* Logo mark */}
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" className="shrink-0">
+            <path d="M4 2H14V6H8V9H12V13H8V18H4Z" fill="var(--accent)" />
+            <path d="M10 5H18V9H13V12H16V15H13V18H10Z" fill="var(--accent)" fillOpacity="0.55" />
+          </svg>
 
-          <span className="text-xs text-ff-muted font-medium">
-            {totalTasks} tasks · {completedTasks} completed · {blockedTasks} blocked
+          <span className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
+            FilterFlow
           </span>
 
-          <span className="text-ff-muted/30 font-bold">·</span>
+          <span
+            className="text-[10px] font-mono px-1.5 py-0.5 rounded border leading-none"
+            style={{
+              color:       'var(--text-muted)',
+              background:  'var(--bg-card)',
+              borderColor: 'var(--bg-border)',
+            }}
+          >
+            v2.1
+          </span>
 
+          <span style={{ color: 'var(--bg-border)' }}>·</span>
+
+          {/* Live pulse */}
           <div className="flex items-center gap-1.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-xs text-ff-muted font-medium">Live</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            <span className="text-[11px] font-medium" style={{ color: 'var(--text-muted)' }}>Live</span>
           </div>
+
+          <span style={{ color: 'var(--bg-border)' }}>·</span>
+
+          {/* Task stats */}
+          <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>
+            <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{total}</span> tasks
+            &nbsp;·&nbsp;
+            <span className="text-emerald-500 font-semibold">{done}</span> done
+            &nbsp;·&nbsp;
+            <span className="text-blue-400 font-semibold">{inProgress}</span> active
+            {blocked > 0 && (
+              <>
+                &nbsp;·&nbsp;
+                <span className="text-red-400 font-semibold">{blocked}</span> blocked
+              </>
+            )}
+          </span>
         </div>
 
-        {/* Center Section Links */}
-        <div className="flex items-center gap-5">
-          <a href="#changelog" className="flex items-center gap-1 text-xs text-ff-muted hover:text-ff-secondary cursor-pointer transition-colors font-medium">
-            <History size={11} />
-            <span>Changelog</span>
-          </a>
-          <a href="#docs" className="flex items-center gap-1 text-xs text-ff-muted hover:text-ff-secondary cursor-pointer transition-colors font-medium">
-            <BookOpen size={11} />
-            <span>Docs</span>
-          </a>
-          <div className="flex items-center gap-1 text-xs text-ff-muted font-medium">
-            <Activity size={11} className="text-emerald-500" />
-            <span>API Status</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-          </div>
+        {/* ── Right: dark/light toggle + credit ── */}
+        <div className="flex items-center gap-3 shrink-0">
+          <span
+            className="text-[11px] hidden sm:inline"
+            style={{ color: 'var(--text-muted)' }}
+          >
+            Built with <span style={{ color: 'var(--accent)' }}>♥</span> &amp; Claude AI
+          </span>
+
+          <span className="hidden sm:block w-px h-3" style={{ background: 'var(--bg-border)' }} />
+
+          {/* ── The visible, labeled Dark / Light toggle ── */}
           <button
             type="button"
-            onClick={onOpenShortcuts}
-            className="text-xs text-ff-muted hover:text-ff-secondary cursor-pointer transition-colors font-medium"
+            onClick={toggleTheme}
+            className="flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg border transition-all duration-200 cursor-pointer active:scale-95"
+            style={{
+              background:   'var(--bg-card)',
+              borderColor:  'var(--bg-border)',
+              color:        'var(--text-secondary)',
+            }}
+            title={isDark ? 'Switch to Light mode' : 'Switch to Dark mode'}
           >
-            Keyboard Shortcuts
+            {isDark
+              ? <><Sun  size={12} className="text-amber-400" /><span>Light</span></>
+              : <><Moon size={12} style={{ color: 'var(--accent)' }} /><span>Dark</span></>
+            }
           </button>
         </div>
 
-        {/* Right Section */}
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5 text-xs text-ff-muted font-medium">
-            <ThemeIcon size={12} className="text-ff-muted" />
-            <span className="capitalize">{currentThemeName} theme</span>
-          </div>
-
-          <span className="text-ff-muted/30 font-bold">·</span>
-
-          <span className="text-xs text-ff-muted font-medium">
-            Built with <span className="text-ff-accent">♥</span> & Claude AI
-          </span>
-        </div>
-      </div>
-
-      {/* Mobile Footer (< 768px) */}
-      <div className="flex md:hidden flex-col gap-3 text-center py-5 px-4 bg-ff-base">
-        <div className="flex items-center justify-center gap-2">
-          <svg 
-            width="16" 
-            height="16" 
-            viewBox="0 0 20 20" 
-            fill="none" 
-            xmlns="http://www.w3.org/2000/svg"
-            className="shrink-0"
-          >
-            <path d="M4 2 H14 V6 H8 V9 H12 V13 H8 V18 H4 Z" fill="var(--accent)" />
-            <path d="M10 5 H18 V9 H13 V12 H16 V15 H13 V18 H10 Z" fill="var(--accent)" fillOpacity="0.6" />
-          </svg>
-          <span className="text-sm font-semibold text-ff-secondary">
-            FilterFlow
-          </span>
-          <span className="text-xs text-ff-muted font-mono ml-1">
-            v2.1.0
-          </span>
-        </div>
-
-        <div className="flex items-center justify-center gap-2.5 flex-wrap">
-          <div className="flex items-center gap-1.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-xs text-ff-muted font-medium">Live</span>
-          </div>
-          <span className="text-ff-muted/30">•</span>
-          <span className="text-xs text-ff-muted font-medium">
-            {totalTasks} tasks · {completedTasks} completed · {blockedTasks} blocked
-          </span>
-        </div>
-
-        <span className="text-xs text-ff-muted/80">
-          Built with <span className="text-ff-accent">♥</span> & Claude AI
-        </span>
       </div>
     </footer>
   );
