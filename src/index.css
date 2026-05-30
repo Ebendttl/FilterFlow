@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-surface-0 font-sans text-customText-primary antialiased;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* Custom Scrollbar styling for smooth, premium feel */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-surface-2 rounded-full hover:bg-customText-tertiary/50 transition-colors;
+  }
+  
+  /* Focus rings */
+  button:focus-visible, 
+  a:focus-visible, 
+  input:focus-visible, 
+  select:focus-visible, 
+  [role="button"]:focus-visible {
+    @apply outline-none ring-2 ring-brand-primary ring-offset-1 transition-shadow duration-150;
+  }
+}
+
+@layer components {
+  .section-label {
+    @apply text-[10px] font-semibold text-customText-tertiary uppercase tracking-widest;
+  }
+  
+  .nav-item-active {
+    @apply bg-indigo-50 text-indigo-700 font-medium;
+  }
+  
+  .nav-item-inactive {
+    @apply text-customText-secondary hover:bg-surface-2 hover:text-customText-primary;
+  }
+
+  .premium-transition {
+    @apply transition-all duration-150 ease-out;
+  }
+}
+
+/* Custom classes for transitions */
+.pill-enter {
+  opacity: 0;
+  max-width: 0;
+  transform: scale(0.9);
+}
+
+.pill-enter-active {
+  opacity: 1;
+  max-width: 200px;
+  transform: scale(1);
+  transition: all 150ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.pill-exit {
+  opacity: 1;
+  max-width: 200px;
+  transform: scale(1);
+}
+
+.pill-exit-active {
+  opacity: 0;
+  max-width: 0;
+  transform: scale(0.9);
+  transition: all 150ms cubic-bezier(0.4, 0, 1, 1);
+}
