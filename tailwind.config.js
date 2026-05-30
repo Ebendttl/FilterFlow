@@ -4,6 +4,7 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       fontFamily: {
@@ -17,7 +18,17 @@ export default {
         accent: {
           violet: '#8b5cf6',
           cyan: '#06b6d4',
-        }
+        },
+        'ff-base':      'var(--bg-base)',
+        'ff-elevated':  'var(--bg-elevated)',
+        'ff-card':      'var(--bg-card)',
+        'ff-hover':     'var(--bg-hover)',
+        'ff-border':    'var(--bg-border)',
+        'ff-primary':   'var(--text-primary)',
+        'ff-secondary': 'var(--text-secondary)',
+        'ff-muted':     'var(--text-muted)',
+        'ff-accent':    'var(--accent)',
+        'ff-cyan':      'var(--accent-cyan)',
       },
       animation: {
         'shimmer': 'shimmer 1.5s infinite',
@@ -44,7 +55,7 @@ export default {
         'glow-cyan': '0 0 20px rgba(6, 182, 212, 0.08)',
       },
       backgroundImage: {
-        'dot-grid': 'radial-gradient(circle, #27272a 1px, transparent 1px)',
+        'dot-grid': 'radial-gradient(circle, var(--bg-border) 1px, transparent 1px)',
       },
       backgroundSize: {
         'dot-grid': '24px 24px',

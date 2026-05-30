@@ -7,7 +7,6 @@ import { useEffect } from 'react';
 export function useKeyboard(shortcuts) {
   useEffect(() => {
     function handleKeyDown(e) {
-      // Don't fire when typing in inputs/textareas (except specific shortcuts)
       const tag = e.target.tagName.toLowerCase();
       const isEditing = tag === 'input' || tag === 'textarea' || e.target.isContentEditable;
 
@@ -17,7 +16,7 @@ export function useKeyboard(shortcuts) {
         const requiresMeta = parts.includes('Meta');
         const requiresCtrl = parts.includes('Control');
         const requiresShift = parts.includes('Shift');
-        const allowInInput = parts.includes('allowInInput');
+        const allowInInput = parts.includes('allowInInput') || key === 'escape';
 
         if (isEditing && !allowInInput && (requiresMeta || requiresCtrl)) {
           // Allow cmd/ctrl shortcuts even in inputs (for ⌘K, ⌘J, ⌘N)
@@ -31,7 +30,6 @@ export function useKeyboard(shortcuts) {
         const shiftMatches = requiresShift ? e.shiftKey : true;
 
         if (keyMatches && metaMatches && ctrlMatches && shiftMatches) {
-          // Avoid double-firing for Meta+k and Control+k
           if ((requiresMeta || requiresCtrl) && !e.metaKey && !e.ctrlKey) continue;
           e.preventDefault();
           handler(e);

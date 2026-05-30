@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import TaskTableRow from './TaskTableRow';
 import Skeleton from '../ui/Skeleton';
@@ -27,6 +27,7 @@ export default function TaskTable({
   onDuplicate,
   onDelete,
   onStatusChange,
+  onUpdateTask,
   onSetSort,
   filters,
   clearAllFilters,
@@ -41,23 +42,23 @@ export default function TaskTable({
 
   const SortIcon = ({ col }) => {
     if (!col) return null;
-    if (filters.sortBy !== col) return <ChevronUp className="w-3 h-3 text-zinc-700 group-hover:text-zinc-500 transition-colors" />;
+    if (filters.sortBy !== col) return <ChevronUp className="w-3 h-3 text-ff-muted group-hover:text-ff-secondary transition-colors" />;
     return filters.sortDir === 'asc'
-      ? <ChevronUp className="w-3 h-3 text-violet-400" />
-      : <ChevronDown className="w-3 h-3 text-violet-400" />;
+      ? <ChevronUp className="w-3 h-3 text-ff-accent" />
+      : <ChevronDown className="w-3 h-3 text-ff-accent" />;
   };
 
   return (
     <div className="flex-1 overflow-auto">
       <table className="w-full border-collapse">
-        <thead className="sticky top-0 z-10 bg-zinc-950">
-          <tr className="h-10 border-b border-zinc-800">
+        <thead className="sticky top-0 z-10 bg-ff-elevated">
+          <tr className="h-10 border-b border-ff-border">
             <th className="pl-4 pr-2 w-10 text-center">
               <input
                 type="checkbox"
                 checked={allSelected}
                 onChange={onSelectAll}
-                className="w-4 h-4 rounded border-zinc-700 bg-zinc-800 text-violet-600 focus:ring-violet-500 focus:ring-offset-0 cursor-pointer"
+                className="w-4 h-4 rounded border-ff-border bg-ff-card text-ff-accent focus:ring-ff-accent focus:ring-offset-0 cursor-pointer"
                 aria-label="Select all tasks"
               />
             </th>
@@ -65,10 +66,10 @@ export default function TaskTable({
               <th
                 key={i}
                 onClick={col.key ? () => onSetSort(col.key) : undefined}
-                className={`px-4 text-left text-[11px] uppercase tracking-wider text-zinc-600 font-medium ${col.cls} ${col.key ? 'cursor-pointer hover:text-zinc-400 group select-none' : ''} transition-colors`}
+                className={`px-4 text-left text-[11px] uppercase tracking-wider text-ff-muted font-medium ${col.cls} ${col.key ? 'cursor-pointer hover:text-ff-secondary group select-none' : ''} transition-colors`}
               >
                 <div className="flex items-center gap-1">
-                  <span className={filters.sortBy === col.key ? 'text-zinc-300' : ''}>{col.label}</span>
+                  <span className={filters.sortBy === col.key ? 'text-ff-secondary' : ''}>{col.label}</span>
                   <SortIcon col={col.key} />
                 </div>
               </th>
@@ -88,6 +89,7 @@ export default function TaskTable({
               onDuplicate={onDuplicate}
               onDelete={onDelete}
               onStatusChange={onStatusChange}
+              onUpdateTask={onUpdateTask}
             />
           ))}
         </tbody>

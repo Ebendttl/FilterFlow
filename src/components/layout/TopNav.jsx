@@ -1,6 +1,7 @@
-import React, { useRef, useEffect } from 'react';
-import { Menu, Search, Plus, HelpCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { Menu, Search, Plus, Bell, Sun, Moon, Flame, ChevronRight } from 'lucide-react';
 import Avatar from '../ui/Avatar';
+import ThemePicker from '../ui/ThemePicker';
 
 export default function TopNav({
   searchValue,
@@ -8,10 +9,29 @@ export default function TopNav({
   onOpenSidebarDrawer,
   onOpenNewTaskModal,
   onOpenShortcutsModal,
+  onOpenCommandPalette,
   searchInputRef,
+  theme = 'obsidian',
+  themeName,
+  themes,
+  setTheme,
+  isSystem,
+  tasks = []
 }) {
-  
-  // Clean search input clear helper
+  const [showThemePicker, setShowThemePicker] = useState(false);
+
+  // Check if any task is blocked for the notification unread badge dot
+  const hasUnread = tasks.some(t => t.status === 'blocked');
+
+  // Determine active theme icon
+  const themeIcons = {
+    obsidian: Moon,
+    arctic: Sun,
+    midnight: Moon,
+    ember: Flame
+  };
+  const ThemeIcon = themeIcons[theme] || Moon;
+
   const handleKeyDown = (e) => {
     if (e.key === 'Escape') {
       searchInputRef.current?.blur();
@@ -19,61 +39,166 @@ export default function TopNav({
   };
 
   return (
-    <header className="h-14 bg-zinc-950 border-b border-zinc-800 flex items-center justify-between px-4 sm:px-6 shrink-0 select-none">
+    <header className="h-13 px-3 md:px-6 gap-2 md:gap-3 flex items-center sticky top-0 z-45 bg-ff-elevated/90 backdrop-blur-md border-b border-ff-border shrink-0 select-none">
       
-      {/* Left side: Menu toggle + Search Input */}
-      <div className="flex items-center gap-3 flex-1 min-w-0 max-w-lg">
-        {/* Mobile menu trigger */}
-        <button
-          type="button"
+      {/* ========================================================================= */}
+      {/* MOBILE LAYOUT (< 768px)                                                   */}
+      {/* ========================================================================= */}
+      <div className="flex md:hidden items-center justify-between w-full gap-2">
+        
+        {/* Zone A — LEFT (flex-shrink-0) */}
+        <button 
           onClick={onOpenSidebarDrawer}
-          aria-label="Open navigation drawer"
-          className="md:hidden w-8 h-8 rounded-lg hover:bg-zinc-900 flex items-center justify-center text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer shrink-0"
+          type="button"
+          className="flex items-center justify-center w-8 h-8 rounded-lg text-ff-muted hover:text-ff-primary hover:bg-ff-hover transition-colors flex-shrink-0 cursor-pointer"
         >
-          <Menu className="w-5 h-5" />
+          <Menu size={18} />
         </button>
 
-        {/* Local Search input */}
-        <div className="relative flex-1 flex items-center min-w-0 max-w-sm">
-          <Search className="absolute left-3 w-4 h-4 text-zinc-600 pointer-events-none" />
+        {/* Zone B — CENTER (flex-1, min-width-0) */}
+        <div className="flex-1 min-w-0 relative">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-ff-muted/65" size={13} />
           <input
             ref={searchInputRef}
             type="text"
             value={searchValue}
             onChange={e => onSearchChange(e.target.value)}
             onKeyDown={handleKeyDown}
+            className="w-full h-8 bg-ff-hover/60 border border-ff-border rounded-lg pl-8 pr-3 text-xs text-ff-primary placeholder:text-ff-muted focus:outline-none focus:border-ff-accent/60 transition-colors"
             placeholder="Search tasks..."
-            className="w-full bg-zinc-900 hover:bg-zinc-850 focus:bg-zinc-900 border border-zinc-800 focus:border-zinc-700/80 rounded-xl text-xs text-zinc-100 pl-9 pr-12 py-2 outline-none focus:ring-1 focus:ring-zinc-700/30 transition-all placeholder:text-zinc-600"
           />
-          {/* ⌘K Badge */}
-          <span className="absolute right-3 text-[9px] font-bold font-mono bg-zinc-950 border border-zinc-800/80 text-zinc-500 px-1.5 py-0.5 rounded leading-none shrink-0 pointer-events-none">
-            ⌘K
-          </span>
         </div>
+
+        {/* Zone C — RIGHT (flex-shrink-0, flex items-center gap-1) */}
+        <div className="flex-shrink-0 flex items-center gap-1 relative">
+          {/* 1. Theme toggle button */}
+          <button
+            type="button"
+            onClick={() => setShowThemePicker(p => !p)}
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-ff-muted hover:text-ff-primary hover:bg-ff-hover transition-colors cursor-pointer"
+          >
+            <ThemeIcon size={16} />
+          </button>
+
+          {/* 2. Notification bell button */}
+          <button
+            type="button"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-ff-muted hover:text-ff-primary hover:bg-ff-hover relative transition-colors cursor-pointer"
+          >
+            <Bell size={16} />
+            {hasUnread && (
+              <span className="w-1.5 h-1.5 absolute top-2 right-2 bg-red-500 rounded-full shadow" />
+            )}
+          </button>
+
+          {/* 3. New Task button — ICON ONLY on mobile */}
+          <button
+            type="button"
+            onClick={onOpenNewTaskModal}
+            className="w-8 h-8 bg-ff-accent hover:bg-ff-accent/80 rounded-lg flex items-center justify-center text-white flex-shrink-0 cursor-pointer active:scale-95 transition-all duration-150"
+          >
+            <Plus size={16} />
+          </button>
+
+          {showThemePicker && (
+            <ThemePicker
+              themes={themes}
+              theme={theme}
+              setTheme={setTheme}
+              isSystem={isSystem}
+              onClose={() => setShowThemePicker(false)}
+            />
+          )}
+        </div>
+
       </div>
 
-      {/* Right side: New Task CTA + ? button */}
-      <div className="flex items-center gap-3 shrink-0">
+      {/* ========================================================================= */}
+      {/* DESKTOP LAYOUT (>= 768px)                                                 */}
+      {/* ========================================================================= */}
+      <div className="hidden md:flex items-center justify-between w-full">
         
-        {/* Help icon button */}
-        <button
-          type="button"
-          onClick={onOpenShortcutsModal}
-          aria-label="Keyboard Shortcuts"
-          className="w-8 h-8 rounded-lg hover:bg-zinc-900 flex items-center justify-center text-zinc-500 hover:text-zinc-350 transition-colors cursor-pointer select-none"
-        >
-          <HelpCircle className="w-4 h-4" />
-        </button>
+        {/* Left: breadcrumb */}
+        <div className="flex items-center gap-2 select-none text-xs">
+          <span className="text-ff-muted font-bold uppercase tracking-wider text-[10px]">
+            FilterFlow
+          </span>
+          <ChevronRight size={11} className="text-ff-muted/60" />
+          <span className="text-ff-primary font-semibold">
+            Active Workspace
+          </span>
+        </div>
 
-        {/* CTA: Create Task */}
-        <button
-          type="button"
-          onClick={onOpenNewTaskModal}
-          className="h-9 bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold px-3 sm:px-4 rounded-xl flex items-center gap-1.5 shadow-md shadow-violet-950/20 active:scale-[0.98] transition-all duration-150 cursor-pointer"
-        >
-          <Plus className="w-4 h-4" strokeWidth={2.5} />
-          <span className="hidden sm:inline">New Task</span>
-        </button>
+        {/* Center: spacing */}
+        <div className="flex-1" />
+
+        {/* Right side controls */}
+        <div className="flex items-center gap-3 relative shrink-0">
+          
+          {/* Desktop TopNav Search Area */}
+          <div className="relative flex items-center w-48">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-ff-muted/65" size={13} />
+            <input
+              type="text"
+              value={searchValue}
+              onChange={e => onSearchChange(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="w-full h-8 bg-ff-hover/60 border border-ff-border rounded-lg pl-8 pr-12 text-xs text-ff-primary placeholder:text-ff-muted focus:outline-none focus:border-ff-accent/60 transition-colors"
+              placeholder="Search..."
+            />
+            {/* ⌘K Badge acting as shortcut click trigger */}
+            <button
+              type="button"
+              onClick={onOpenCommandPalette}
+              className="absolute right-2 text-[9px] font-bold font-mono bg-ff-card border border-ff-border text-ff-muted px-1.5 py-0.5 rounded leading-none shrink-0 cursor-pointer hover:border-ff-accent hover:text-ff-primary transition-colors"
+            >
+              ⌘K
+            </button>
+          </div>
+
+          {/* Theme Switcher Button */}
+          <button
+            type="button"
+            onClick={() => setShowThemePicker(p => !p)}
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-ff-muted hover:text-ff-primary hover:bg-ff-hover transition-colors cursor-pointer"
+          >
+            <ThemeIcon size={16} />
+          </button>
+
+          {/* Notification bell button */}
+          <button
+            type="button"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-ff-muted hover:text-ff-primary hover:bg-ff-hover relative transition-colors cursor-pointer"
+          >
+            <Bell size={16} />
+            {hasUnread && (
+              <span className="w-1.5 h-1.5 absolute top-2.5 right-2.5 bg-red-500 rounded-full shadow" />
+            )}
+          </button>
+
+          {/* User profile avatar */}
+          <Avatar initials="AJ" color="bg-ff-accent" size="xs" showTooltip={false} />
+
+          {/* New Task Button with label */}
+          <button
+            type="button"
+            onClick={onOpenNewTaskModal}
+            className="h-8 bg-ff-accent hover:bg-ff-accent/80 text-white text-xs font-semibold px-3.5 rounded-lg flex items-center gap-1.5 shadow active:scale-[0.98] transition-all duration-150 cursor-pointer"
+          >
+            <Plus size={14} strokeWidth={2.5} />
+            <span>New Task</span>
+          </button>
+
+          {showThemePicker && (
+            <ThemePicker
+              themes={themes}
+              theme={theme}
+              setTheme={setTheme}
+              isSystem={isSystem}
+              onClose={() => setShowThemePicker(false)}
+            />
+          )}
+        </div>
 
       </div>
 

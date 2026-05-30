@@ -2,6 +2,50 @@
 <html lang="en" class="h-full">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('ff-theme');
+          var themes = {
+            obsidian: { '--bg-base': '#09090b', '--bg-elevated': '#111113',
+                        '--bg-card': '#18181b', '--bg-hover': '#27272a',
+                        '--bg-border': '#3f3f46', '--text-primary': '#fafafa',
+                        '--text-secondary': '#a1a1aa', '--text-muted': '#71717a',
+                        '--accent': '#8b5cf6', '--accent-cyan': '#06b6d4' },
+            arctic:   { '--bg-base': '#ffffff', '--bg-elevated': '#f8fafc',
+                        '--bg-card': '#f1f5f9', '--bg-hover': '#e2e8f0',
+                        '--bg-border': '#cbd5e1', '--text-primary': '#0f172a',
+                        '--text-secondary': '#475569', '--text-muted': '#94a3b8',
+                        '--accent': '#6366f1', '--accent-cyan': '#0891b2' },
+            midnight: { '--bg-base': '#0d1117', '--bg-elevated': '#161b22',
+                        '--bg-card': '#1c2128', '--bg-hover': '#262c36',
+                        '--bg-border': '#30363d', '--text-primary': '#e6edf3',
+                        '--text-secondary': '#8b949e', '--text-muted': '#6e7681',
+                        '--accent': '#58a6ff', '--accent-cyan': '#39d353' },
+            ember:    { '--bg-base': '#0c0a09', '--bg-elevated': '#1c1917',
+                        '--bg-card': '#292524', '--bg-hover': '#3c3836',
+                        '--bg-border': '#57534e', '--text-primary': '#fafaf9',
+                        '--text-secondary': '#a8a29e', '--text-muted': '#78716c',
+                        '--accent': '#f97316', '--accent-cyan': '#fb923c' }
+          };
+          var key = saved || 
+            (window.matchMedia('(prefers-color-scheme: dark)').matches 
+              ? 'obsidian' : 'arctic');
+          if (key === 'system') {
+            key = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'obsidian' : 'arctic';
+          }
+          var vars = themes[key] || themes.obsidian;
+          var root = document.documentElement;
+          Object.keys(vars).forEach(function(k){ 
+            root.style.setProperty(k, vars[k]); 
+          });
+          root.setAttribute('data-theme', key);
+          if (['obsidian','midnight','ember'].includes(key)) {
+            root.classList.add('dark');
+          }
+        } catch(e) {}
+      })();
+    </script>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Crect x='2' y='2' width='10' height='10' rx='2' fill='%238b5cf6'/%3E%3Crect x='8' y='8' width='10' height='10' rx='2' fill='%238b5cf6' fill-opacity='0.7'/%3E%3C/svg%3E" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FilterFlow v2 — AI-Powered Task Management</title>
@@ -10,7 +54,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
   </head>
-  <body class="h-full bg-zinc-950 font-sans antialiased">
+  <body class="h-full bg-ff-base text-ff-primary font-sans antialiased">
     <div id="root" class="h-full"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
