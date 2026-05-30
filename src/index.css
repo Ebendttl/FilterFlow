@@ -2,76 +2,122 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  body {
-    @apply bg-surface-0 font-sans text-customText-primary antialiased;
-    font-size: 14px;
-    line-height: 1.5;
-  }
-
-  /* Custom Scrollbar styling for smooth, premium feel */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    @apply bg-surface-2 rounded-full hover:bg-customText-tertiary/50 transition-colors;
-  }
-  
-  /* Focus rings */
-  button:focus-visible, 
-  a:focus-visible, 
-  input:focus-visible, 
-  select:focus-visible, 
-  [role="button"]:focus-visible {
-    @apply outline-none ring-2 ring-brand-primary ring-offset-1 transition-shadow duration-150;
-  }
+/* ── CSS Custom Properties ── */
+:root {
+  --bg-base:       #09090b;
+  --bg-elevated:   #111113;
+  --bg-card:       #18181b;
+  --bg-hover:      #27272a;
+  --bg-border:     #3f3f46;
+  --bg-muted:      #52525b;
+  --text-primary:  #fafafa;
+  --text-secondary:#a1a1aa;
+  --text-muted:    #71717a;
+  --accent-violet: #8b5cf6;
+  --accent-cyan:   #06b6d4;
+  --accent-glow:   rgba(139,92,246,0.15);
+  --cyan-glow:     rgba(6,182,212,0.12);
 }
 
-@layer components {
-  .section-label {
-    @apply text-[10px] font-semibold text-customText-tertiary uppercase tracking-widest;
-  }
-  
-  .nav-item-active {
-    @apply bg-indigo-50 text-indigo-700 font-medium;
-  }
-  
-  .nav-item-inactive {
-    @apply text-customText-secondary hover:bg-surface-2 hover:text-customText-primary;
-  }
+/* ── Base Reset ── */
+*, *::before, *::after { box-sizing: border-box; }
 
-  .premium-transition {
-    @apply transition-all duration-150 ease-out;
-  }
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
-/* Custom classes for transitions */
-.pill-enter {
-  opacity: 0;
-  max-width: 0;
-  transform: scale(0.9);
+body {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: 'DM Sans', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
 }
 
-.pill-enter-active {
-  opacity: 1;
-  max-width: 200px;
-  transform: scale(1);
-  transition: all 150ms cubic-bezier(0, 0, 0.2, 1);
+/* ── Dot Grid Background ── */
+.dot-grid-bg {
+  background-image: radial-gradient(circle, rgba(39, 39, 42, 0.5) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 
-.pill-exit {
-  opacity: 1;
-  max-width: 200px;
-  transform: scale(1);
+/* ── Custom Scrollbars ── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #52525b; }
+
+/* ── Shimmer Animation ── */
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
 }
 
-.pill-exit-active {
-  opacity: 0;
-  max-width: 0;
-  transform: scale(0.9);
-  transition: all 150ms cubic-bezier(0.4, 0, 1, 1);
+.shimmer {
+  background: linear-gradient(90deg, #18181b 25%, #27272a 50%, #18181b 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ── Bounce Dots (AI thinking) ── */
+@keyframes bounceDot {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-6px); }
+}
+
+.bounce-dot-1 { animation: bounceDot 1.2s ease-in-out infinite; }
+.bounce-dot-2 { animation: bounceDot 1.2s ease-in-out 0.15s infinite; }
+.bounce-dot-3 { animation: bounceDot 1.2s ease-in-out 0.3s infinite; }
+
+/* ── Focus Ring ── */
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent-violet);
+}
+
+/* ── AI Glow Border ── */
+.ai-glow {
+  border-color: rgba(6, 182, 212, 0.2);
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.04) inset;
+}
+
+/* ── Violet Active Glow ── */
+.violet-glow {
+  box-shadow: 0 0 0 2px var(--accent-violet);
+}
+
+/* ── Gradient for new task highlight ── */
+@keyframes newTaskFlash {
+  0% { background-color: rgba(139, 92, 246, 0.2); }
+  100% { background-color: transparent; }
+}
+
+.new-task-flash {
+  animation: newTaskFlash 2s ease-out forwards;
+}
+
+/* ── Selection ── */
+::selection {
+  background: rgba(139, 92, 246, 0.3);
+  color: #fafafa;
+}
+
+/* ── Line clamp ── */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── No scrollbar (for horizontal scroll areas) ── */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ── Drag over state ── */
+.drag-over {
+  background-color: rgba(139, 92, 246, 0.1) !important;
+  border-color: rgba(139, 92, 246, 0.4) !important;
 }

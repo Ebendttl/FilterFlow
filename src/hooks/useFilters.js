@@ -1,155 +1,164 @@
-import { useState, useMemo, useEffect } from 'react';
-import { tasks as initialTasks } from '../data/tasks';
-import { parseISO, isAfter, isBefore, isEqual, startOfDay, endOfDay } from 'date-fns';
+import { useState, useMemo } from 'react';
+import { parseISO, isAfter, isBefore, startOfDay, endOfDay } from 'date-fns';
 
 const initialFilters = {
-  search: "",
+  search: '',
   statuses: [],
   priorities: [],
   assignees: [],
   projects: [],
-  dateRange: { start: null, end: null }
+  dateRange: { start: null, end: null },
+  sortBy: null,
+  sortDir: 'asc',
+  aiApplied: false,
 };
 
-export function useFilters() {
+export function useFilters(tasks) {
   const [filters, setFilters] = useState(initialFilters);
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-
-  // Debounce search query changes
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(filters.search);
-    }, 200);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [filters.search]);
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const debounceRef = useState(null);
 
   const setSearch = (search) => {
-    setFilters(prev => ({ ...prev, search }));
+    setFilters(f => ({ ...f, search, aiApplied: false }));
+    clearTimeout(debounceRef[0]);
+    debounceRef[0] = setTimeout(() => setDebouncedSearch(search), 200);
   };
 
-  const toggleStatus = (status) => {
-    setFilters(prev => {
-      const statuses = prev.statuses.includes(status)
-        ? prev.statuses.filter(s => s !== status)
-        : [...prev.statuses, status];
-      return { ...prev, statuses };
-    });
-  };
+  const toggleStatus = (s) => setFilters(f => ({
+    ...f, aiApplied: false,
+    statuses: f.statuses.includes(s) ? f.statuses.filter(x => x !== s) : [...f.statuses, s]
+  }));
 
-  const togglePriority = (priority) => {
-    setFilters(prev => {
-      const priorities = prev.priorities.includes(priority)
-        ? prev.priorities.filter(p => p !== priority)
-        : [...prev.priorities, priority];
-      return { ...prev, priorities };
-    });
-  };
+  const togglePriority = (p) => setFilters(f => ({
+    ...f, aiApplied: false,
+    priorities: f.priorities.includes(p) ? f.priorities.filter(x => x !== p) : [...f.priorities, p]
+  }));
 
-  const toggleAssignee = (assigneeName) => {
-    setFilters(prev => {
-      const assignees = prev.assignees.includes(assigneeName)
-        ? prev.assignees.filter(a => a !== assigneeName)
-        : [...prev.assignees, assigneeName];
-      return { ...prev, assignees };
-    });
-  };
+  const toggleAssignee = (a) => setFilters(f => ({
+    ...f, aiApplied: false,
+    assignees: f.assignees.includes(a) ? f.assignees.filter(x => x !== a) : [...f.assignees, a]
+  }));
 
-  const toggleProject = (projectName) => {
-    setFilters(prev => {
-      const projects = prev.projects.includes(projectName)
-        ? prev.projects.filter(p => p !== projectName)
-        : [...prev.projects, projectName];
-      return { ...prev, projects };
-    });
-  };
+  const toggleProject = (p) => setFilters(f => ({
+    ...f, aiApplied: false,
+    projects: f.projects.includes(p) ? f.projects.filter(x => x !== p) : [...f.projects, p]
+  }));
 
-  const setDateRange = (start, end) => {
-    setFilters(prev => ({
-      ...prev,
-      dateRange: { start, end }
-    }));
-  };
+  const setDateRange = (start, end) => setFilters(f => ({
+    ...f, aiApplied: false, dateRange: { start, end }
+  }));
 
-  const clearFilter = (key) => {
-    setFilters(prev => {
-      if (key === 'dateRange') {
-        return { ...prev, dateRange: { start: null, end: null } };
-      }
-      if (Array.isArray(prev[key])) {
-        return { ...prev, [key]: [] };
-      }
-      return { ...prev, [key]: "" };
-    });
-  };
+  const setSort = (col) => setFilters(f => ({
+    ...f,
+    sortBy: col,
+    sortDir: f.sortBy === col ? (f.sortDir === 'asc' ? 'desc' : 'asc') : 'asc'
+  }));
+
+  const clearFilter = (key) => setFilters(f => {
+    if (key === 'dateRange') return { ...f, dateRange: { start: null, end: null }, aiApplied: false };
+    if (key === 'search') { setDebouncedSearch(''); return { ...f, search: '', aiApplied: false }; }
+    if (Array.isArray(f[key])) return { ...f, [key]: [], aiApplied: false };
+    return { ...f, [key]: '', aiApplied: false };
+  });
 
   const clearAllFilters = () => {
+    setDebouncedSearch('');
     setFilters(initialFilters);
   };
 
+  // Used by AI command bar to apply filters in one shot
+  const setAllFilters = (filtersObj) => {
+    setDebouncedSearch(filtersObj.search || '');
+    setFilters(f => ({
+      ...f,
+      search: filtersObj.search || '',
+      statuses: filtersObj.statuses || [],
+      priorities: filtersObj.priorities || [],
+      assignees: filtersObj.assignees || [],
+      projects: filtersObj.projects || [],
+      dateRange: filtersObj.dateRange || { start: null, end: null },
+      aiApplied: true,
+    }));
+  };
+
   const filteredTasks = useMemo(() => {
-    return initialTasks.filter(task => {
-      // 1. Search Query filter (matches task title or task id)
-      if (debouncedSearch.trim() !== "") {
-        const query = debouncedSearch.toLowerCase().trim();
-        const matchesTitle = task.title.toLowerCase().includes(query);
-        const matchesId = task.id.toLowerCase().includes(query);
-        if (!matchesTitle && !matchesId) return false;
-      }
+    let result = [...tasks];
 
-      // 2. Statuses filter
-      if (filters.statuses.length > 0) {
-        if (!filters.statuses.includes(task.status)) return false;
-      }
+    // Search
+    if (debouncedSearch.trim()) {
+      const q = debouncedSearch.toLowerCase();
+      result = result.filter(t =>
+        t.title.toLowerCase().includes(q) || t.id.toLowerCase().includes(q)
+      );
+    }
 
-      // 3. Priorities filter
-      if (filters.priorities.length > 0) {
-        if (!filters.priorities.includes(task.priority)) return false;
-      }
+    // Statuses
+    if (filters.statuses.length > 0) {
+      result = result.filter(t => filters.statuses.includes(t.status));
+    }
 
-      // 4. Assignees filter
-      if (filters.assignees.length > 0) {
-        if (!filters.assignees.includes(task.assignee.name)) return false;
-      }
+    // Priorities
+    if (filters.priorities.length > 0) {
+      result = result.filter(t => filters.priorities.includes(t.priority));
+    }
 
-      // 5. Projects filter
-      if (filters.projects.length > 0) {
-        if (!filters.projects.includes(task.project)) return false;
-      }
+    // Assignees
+    if (filters.assignees.length > 0) {
+      result = result.filter(t => filters.assignees.includes(t.assignee.name));
+    }
 
-      // 6. Date Range filter (inclusive)
-      if (filters.dateRange.start) {
-        const taskDate = startOfDay(parseISO(task.dueDate));
-        const startDate = startOfDay(new Date(filters.dateRange.start));
-        
+    // Projects
+    if (filters.projects.length > 0) {
+      result = result.filter(t => filters.projects.includes(t.project));
+    }
+
+    // Date range
+    if (filters.dateRange.start) {
+      const start = startOfDay(new Date(filters.dateRange.start));
+      result = result.filter(t => {
+        const due = startOfDay(parseISO(t.dueDate));
         if (filters.dateRange.end) {
-          const endDate = endOfDay(new Date(filters.dateRange.end));
-          if (isBefore(taskDate, startDate) || isAfter(taskDate, endDate)) {
-            return false;
-          }
-        } else {
-          // If only start date is selected, compare on that specific day
-          if (!isEqual(taskDate, startDate) && isBefore(taskDate, startDate)) {
-            return false;
-          }
+          const end = endOfDay(new Date(filters.dateRange.end));
+          return !isBefore(due, start) && !isAfter(due, end);
         }
-      }
+        return !isBefore(due, start);
+      });
+    }
 
-      return true;
-    });
-  }, [filters, debouncedSearch]);
+    // Sort
+    if (filters.sortBy) {
+      const dir = filters.sortDir === 'asc' ? 1 : -1;
+      const statusOrder = { todo:1, in_progress:2, in_review:3, done:4, blocked:5 };
+      const priorityOrder = { none:1, low:2, medium:3, high:4, urgent:5 };
+
+      result.sort((a, b) => {
+        let va, vb;
+        switch (filters.sortBy) {
+          case 'title': va = a.title; vb = b.title; break;
+          case 'status': va = statusOrder[a.status]; vb = statusOrder[b.status]; break;
+          case 'priority': va = priorityOrder[a.priority]; vb = priorityOrder[b.priority]; break;
+          case 'dueDate': va = a.dueDate; vb = b.dueDate; break;
+          case 'createdAt': va = a.createdAt; vb = b.createdAt; break;
+          default: return 0;
+        }
+        if (va < vb) return -1 * dir;
+        if (va > vb) return 1 * dir;
+        return 0;
+      });
+    }
+
+    return result;
+  }, [tasks, debouncedSearch, filters]);
 
   const activeFilterCount = useMemo(() => {
-    let count = 0;
-    if (filters.search.trim() !== "") count += 1;
-    if (filters.statuses.length > 0) count += 1;
-    if (filters.priorities.length > 0) count += 1;
-    if (filters.assignees.length > 0) count += 1;
-    if (filters.projects.length > 0) count += 1;
-    if (filters.dateRange.start !== null) count += 1;
-    return count;
+    let c = 0;
+    if (filters.search.trim()) c++;
+    if (filters.statuses.length) c++;
+    if (filters.priorities.length) c++;
+    if (filters.assignees.length) c++;
+    if (filters.projects.length) c++;
+    if (filters.dateRange.start) c++;
+    return c;
   }, [filters]);
 
   return {
@@ -162,7 +171,9 @@ export function useFilters() {
     toggleAssignee,
     toggleProject,
     setDateRange,
+    setSort,
+    setAllFilters,
     clearFilter,
-    clearAllFilters
+    clearAllFilters,
   };
 }

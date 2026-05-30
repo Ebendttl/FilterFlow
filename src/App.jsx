@@ -1,14 +1,57 @@
-import React, { useState, useEffect } from 'react';
-import { LayoutList, LayoutGrid, SearchX } from 'lucide-react';
-import Sidebar from './components/Sidebar';
-import TopNav from './components/TopNav';
-import FilterToolbar from './components/FilterToolbar';
-import ActiveFilterBar from './components/ActiveFilterBar';
-import TaskTable from './components/TaskTable';
-import TaskCard from './components/TaskCard';
+import React, { useState, useRef } from 'react';
+import { Toaster, toast } from 'react-hot-toast';
+
+// Layout components
+import Sidebar from './components/layout/Sidebar';
+import TopNav from './components/layout/TopNav';
+import MobileSidebarDrawer from './components/layout/MobileSidebarDrawer';
+import AIChatPanel from './components/layout/AIChatPanel';
+
+// Filter components
+import AICommandBar from './components/filters/AICommandBar';
+import FilterToolbar from './components/filters/FilterToolbar';
+import ActiveFilterBar from './components/filters/ActiveFilterBar';
+
+// View components
+import TaskTable from './components/tasks/TaskTable';
+import TaskMobileList from './components/tasks/TaskMobileList';
+import BoardView from './components/views/BoardView';
+import CalendarView from './components/views/CalendarView';
+import TimelineView from './components/views/TimelineView';
+import ProjectsView from './components/views/ProjectsView';
+import SprintsView from './components/views/SprintsView';
+import ReportsView from './components/views/ReportsView';
+import InsightsView from './components/views/InsightsView';
+
+// Overlay components
+import TaskDetailSheet from './components/tasks/TaskDetailSheet';
+import BulkActionsBar from './components/tasks/BulkActionsBar';
+import NewTaskModal from './components/modals/NewTaskModal';
+import KeyboardShortcutsModal from './components/modals/KeyboardShortcutsModal';
+
+// Hooks
+import { useTaskStore } from './hooks/useTaskStore';
 import { useFilters } from './hooks/useFilters';
+import { useIsMobile } from './hooks/useMediaQuery';
+import { useKeyboard } from './hooks/useKeyboard';
 
 export default function App() {
+  const isMobile = useIsMobile();
+  const searchInputRef = useRef(null);
+  const commandBarRef = useRef(null);
+
+  // Centralized Task Store
+  const {
+    tasks,
+    addTask,
+    updateTask,
+    deleteTask,
+    duplicateTask,
+    moveTasks,
+    newTaskId
+  } = useTaskStore();
+
+  // Advanced Filters Hook
   const {
     filters,
     filteredTasks,
@@ -19,159 +62,288 @@ export default function App() {
     toggleAssignee,
     toggleProject,
     setDateRange,
+    setSort,
+    setAllFilters,
     clearFilter,
     clearAllFilters
-  } = useFilters();
+  } = useFilters(tasks);
 
-  const [viewMode, setViewMode] = useState('table'); // 'table' | 'card'
-  const [isLoading, setIsLoading] = useState(true);
+  // Views & Overlay state
+  const [activeView, setActiveView] = useState('all-tasks'); // 'my-tasks' | 'all-tasks' | 'board' | 'calendar' | 'timeline' | 'projects' | 'sprints' | 'reports' | 'insights'
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [selectedIds, setSelectedIds] = useState([]);
+  
+  // Modals & Panels open state
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isAiPanelOpen, setIsAiPanelOpen] = useState(false);
+  const [isNewTaskOpen, setIsNewTaskOpen] = useState(false);
+  const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
 
-  // Synced loading state for initial load simulation
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 600);
-    return () => clearTimeout(timer);
-  }, []);
+  // Keyboard Shortcuts Binding
+  useKeyboard({
+    'Meta+k': () => {
+      commandBarRef.current?.focus();
+    },
+    'Meta+j': () => {
+      setIsAiPanelOpen(o => !o);
+    },
+    'Meta+n': () => {
+      setIsNewTaskOpen(true);
+    },
+    'escape': () => {
+      setIsNewTaskOpen(false);
+      setIsShortcutsOpen(false);
+      setSelectedTask(null);
+      setIsSidebarOpen(false);
+    },
+    '?': (e) => {
+      const tag = e.target.tagName.toLowerCase();
+      if (tag !== 'input' && tag !== 'textarea') {
+        setIsShortcutsOpen(true);
+      }
+    }
+  });
 
-  const isFiltered = filteredTasks.length < 48 || activeFilterCount > 0;
+  // Calculate my tasks or all tasks list
+  const displayedTasks = activeView === 'my-tasks'
+    ? filteredTasks.filter(t => t.assignee?.name === 'Alex Johnson')
+    : filteredTasks;
+
+  // Single ID selection helper
+  const handleSelectId = (id) => {
+    setSelectedIds(prev =>
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+    );
+  };
+
+  // Select all helper
+  const handleSelectAll = () => {
+    const listToSelect = displayedTasks.map(t => t.id);
+    if (selectedIds.length === listToSelect.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(listToSelect);
+    }
+  };
+
+  // Batch Update helper used by bulk action bar
+  const handleUpdateTasks = (ids, patch) => {
+    ids.forEach(id => updateTask(id, patch));
+  };
+
+  // Batch Delete helper
+  const handleDeleteSelected = (ids) => {
+    ids.forEach(id => deleteTask(id));
+  };
 
   return (
-    <div className="flex h-screen w-full bg-surface-0 overflow-hidden font-sans">
-      {/* Fixed Navigation Sidebar */}
-      <Sidebar />
+    <div className="flex h-screen w-screen overflow-hidden bg-zinc-950 text-zinc-150 font-sans antialiased relative">
+      
+      {/* Background dot grid layout */}
+      <div className="absolute inset-0 bg-[radial-gradient(#27272a_1px,transparent_1px)] [background-size:24px_24px] opacity-40 pointer-events-none" />
 
-      {/* Main Content Area */}
-      <main className="flex-1 flex flex-col h-full overflow-hidden">
+      {/* Desktop Sidebar (hidden on mobile) */}
+      <div className="hidden md:block w-64 h-full border-r border-zinc-800 shrink-0">
+        <Sidebar
+          activeView={activeView}
+          onViewChange={setActiveView}
+          onToggleAiPanel={() => setIsAiPanelOpen(o => !o)}
+          onOpenSettings={() => toast('Settings panel coming soon', { style: { background:'#18181b', color:'#fafafa', border:'1px solid #3f3f46' } })}
+          tasks={tasks}
+        />
+      </div>
+
+      {/* Mobile Drawer (toggled from burger) */}
+      <MobileSidebarDrawer
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        activeView={activeView}
+        onViewChange={setActiveView}
+        onToggleAiPanel={() => setIsAiPanelOpen(o => !o)}
+        onOpenSettings={() => toast('Settings panel coming soon', { style: { background:'#18181b', color:'#fafafa', border:'1px solid #3f3f46' } })}
+        tasks={tasks}
+      />
+
+      {/* Main Workspace Frame */}
+      <div className="flex-1 flex flex-col min-w-0 h-full relative z-10">
+        
         {/* Top Navbar */}
-        <TopNav />
-
-        {/* Filter Toolbar */}
-        <FilterToolbar
-          filters={filters}
-          setSearch={setSearch}
-          toggleStatus={toggleStatus}
-          togglePriority={togglePriority}
-          toggleAssignee={toggleAssignee}
-          toggleProject={toggleProject}
-          setDateRange={setDateRange}
+        <TopNav
+          searchValue={filters.search}
+          onSearchChange={setSearch}
+          onOpenSidebarDrawer={() => setIsSidebarOpen(true)}
+          onOpenNewTaskModal={() => setIsNewTaskOpen(true)}
+          onOpenShortcutsModal={() => setIsShortcutsOpen(true)}
+          searchInputRef={searchInputRef}
         />
 
-        {/* Active Filters Pill Bar (conditional transition) */}
-        <ActiveFilterBar
-          filters={filters}
-          activeFilterCount={activeFilterCount}
-          clearFilter={clearFilter}
-          clearAllFilters={clearAllFilters}
-        />
+        {/* AI Command Bar for natural language searching */}
+        {(activeView === 'all-tasks' || activeView === 'my-tasks' || activeView === 'board') && (
+          <AICommandBar
+            onFiltersApplied={setAllFilters}
+            commandBarRef={commandBarRef}
+          />
+        )}
 
-        {/* Results Counter & View Toggle Bar */}
-        <div className="h-8 border-b border-customBorder flex items-center justify-between px-6 shrink-0 bg-surface-1/40 select-none">
-          <span className="text-[13px] text-customText-secondary font-medium">
-            {isLoading ? (
-              <span className="inline-block w-24 h-4 bg-gray-100 rounded animate-pulse" />
-            ) : isFiltered ? (
-              `${filteredTasks.length} of 48 tasks`
-            ) : (
-              '48 tasks'
-            )}
-          </span>
+        {/* Traditional Dropdown Filters */}
+        {(activeView === 'all-tasks' || activeView === 'my-tasks' || activeView === 'board') && (
+          <FilterToolbar
+            filters={filters}
+            toggleStatus={toggleStatus}
+            togglePriority={togglePriority}
+            toggleAssignee={toggleAssignee}
+            toggleProject={toggleProject}
+            setDateRange={setDateRange}
+            setSort={setSort}
+          />
+        )}
 
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={() => setViewMode('table')}
-              aria-label="Table View"
-              className={`w-6 h-6 flex items-center justify-center rounded transition-all duration-150 cursor-pointer ${
-                viewMode === 'table'
-                  ? 'bg-surface-2 text-customText-primary font-bold shadow-sm'
-                  : 'text-customText-secondary hover:text-customText-primary'
-              }`}
-            >
-              <LayoutList className="w-4 h-4" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('card')}
-              aria-label="Card Grid View"
-              className={`w-6 h-6 flex items-center justify-center rounded transition-all duration-150 cursor-pointer ${
-                viewMode === 'card'
-                  ? 'bg-surface-2 text-customText-primary font-bold shadow-sm'
-                  : 'text-customText-secondary hover:text-customText-primary'
-              }`}
-            >
-              <LayoutGrid className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
+        {/* Active filters summary indicator row */}
+        {(activeView === 'all-tasks' || activeView === 'my-tasks' || activeView === 'board') && (
+          <ActiveFilterBar
+            filters={filters}
+            activeFilterCount={activeFilterCount}
+            clearFilter={clearFilter}
+            clearAllFilters={clearAllFilters}
+          />
+        )}
 
-        {/* Task List Workspace Content */}
-        <div className="flex-1 flex flex-col min-h-0 overflow-y-auto bg-surface-0">
-          {isLoading ? (
-            viewMode === 'table' ? (
-              <TaskTable 
-                filteredTasks={[]} 
-                clearAllFilters={clearAllFilters} 
-              />
-            ) : (
-              /* Card View Skeleton Loader */
-              <div className="grid grid-cols-3 gap-4 p-6">
-                {Array.from({ length: 12 }).map((_, idx) => (
-                  <div 
-                    key={idx} 
-                    className="bg-white border border-customBorder rounded-xl p-4 animate-pulse flex flex-col justify-between h-40 shadow-sm"
-                  >
-                    <div>
-                      <div className="flex justify-between">
-                        <div className="w-12 h-3.5 bg-gray-100 rounded" />
-                        <div className="w-14 h-4 bg-gray-100 rounded" />
-                      </div>
-                      <div className="h-4 bg-gray-100 rounded w-5/6 mt-3" />
-                      <div className="h-4 bg-gray-100 rounded w-2/3 mt-2" />
-                    </div>
-                    <div className="flex justify-between items-center mt-4 pt-3 border-t border-customBorder">
-                      <div className="w-16 h-5 bg-gray-100 rounded-full" />
-                      <div className="w-6 h-6 bg-gray-100 rounded-full" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )
-          ) : filteredTasks.length === 0 ? (
-            /* Shared Empty State */
-            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center select-none animate-fade-in">
-              <div className="w-12 h-12 rounded-xl bg-surface-1 flex items-center justify-center border border-customBorder shadow-sm mb-4">
-                <SearchX className="w-6 h-6 text-customText-tertiary" />
-              </div>
-              <h3 className="text-base font-semibold text-customText-primary">
-                No tasks match your filters
-              </h3>
-              <p className="text-sm text-customText-secondary mt-1 max-w-xs">
-                Try adjusting or clearing your filters to view active tasks.
-              </p>
-              <button
-                type="button"
-                onClick={clearAllFilters}
-                className="mt-5 h-9 px-4 bg-brand-primary hover:bg-brand-hover text-white font-semibold rounded-lg text-xs transition-colors shadow-sm focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1 active:scale-[0.98] cursor-pointer"
-              >
-                Clear filters
-              </button>
-            </div>
-          ) : viewMode === 'table' ? (
-            <TaskTable 
-              filteredTasks={filteredTasks} 
-              clearAllFilters={clearAllFilters} 
-            />
-          ) : (
-            /* Card Grid View */
-            <div className="grid grid-cols-3 gap-4 p-6 animate-fade-in">
-              {filteredTasks.map(task => (
-                <TaskCard key={task.id} task={task} />
-              ))}
-            </div>
-          )}
-        </div>
-      </main>
+        {/* Scrollable View Area */}
+        <main className="flex-1 overflow-hidden flex flex-col min-h-0 bg-zinc-950/20">
+          {(() => {
+            if (activeView === 'all-tasks' || activeView === 'my-tasks') {
+              return isMobile ? (
+                <TaskMobileList
+                  tasks={displayedTasks}
+                  onRowClick={setSelectedTask}
+                  clearAllFilters={clearAllFilters}
+                  onAskAI={() => commandBarRef.current?.focus()}
+                />
+              ) : (
+                <TaskTable
+                  tasks={displayedTasks}
+                  newTaskId={newTaskId}
+                  isLoading={false}
+                  selectedIds={selectedIds}
+                  onSelectId={handleSelectId}
+                  onSelectAll={handleSelectAll}
+                  onRowClick={setSelectedTask}
+                  onEdit={setSelectedTask}
+                  onDuplicate={duplicateTask}
+                  onDelete={deleteTask}
+                  onStatusChange={updateTask}
+                  onSetSort={setSort}
+                  filters={filters}
+                  clearAllFilters={clearAllFilters}
+                  onAskAI={() => commandBarRef.current?.focus()}
+                />
+              );
+            }
+            if (activeView === 'board') {
+              return (
+                <BoardView
+                  tasks={displayedTasks}
+                  onMoveTasks={moveTasks}
+                  onTaskClick={setSelectedTask}
+                />
+              );
+            }
+            if (activeView === 'calendar') {
+              return (
+                <CalendarView
+                  tasks={filteredTasks}
+                  onTaskClick={setSelectedTask}
+                />
+              );
+            }
+            if (activeView === 'timeline') {
+              return (
+                <TimelineView
+                  tasks={filteredTasks}
+                  onTaskClick={setSelectedTask}
+                />
+              );
+            }
+            if (activeView === 'projects') {
+              return (
+                <ProjectsView
+                  tasks={tasks}
+                  onTaskClick={setSelectedTask}
+                />
+              );
+            }
+            if (activeView === 'sprints') {
+              return (
+                <SprintsView
+                  tasks={tasks}
+                  onTaskClick={setSelectedTask}
+                />
+              );
+            }
+            if (activeView === 'reports') {
+              return (
+                <ReportsView
+                  tasks={tasks}
+                />
+              );
+            }
+            if (activeView === 'insights') {
+              return (
+                <InsightsView
+                  tasks={tasks}
+                />
+              );
+            }
+            return null;
+          })()}
+        </main>
+
+      </div>
+
+      {/* Floating Right AI Chat panel (pushes content on desktop or overlays) */}
+      <AIChatPanel
+        isOpen={isAiPanelOpen}
+        onClose={() => setIsAiPanelOpen(false)}
+        tasks={tasks}
+        onAddTask={addTask}
+        isMobile={isMobile}
+      />
+
+      {/* Task Detail Slide-over Panel (from right or bottom) */}
+      <TaskDetailSheet
+        task={selectedTask}
+        isOpen={!!selectedTask}
+        onClose={() => setSelectedTask(null)}
+        onUpdate={updateTask}
+        onDelete={deleteTask}
+        isMobile={isMobile}
+      />
+
+      {/* Bulk actions float bar */}
+      <BulkActionsBar
+        selectedIds={selectedIds}
+        tasks={displayedTasks}
+        onClearSelection={() => setSelectedIds([])}
+        onUpdateTasks={handleUpdateTasks}
+        onDeleteSelected={handleDeleteSelected}
+      />
+
+      {/* New Task Overlay Modal */}
+      <NewTaskModal
+        isOpen={isNewTaskOpen}
+        onClose={() => setIsNewTaskOpen(false)}
+        onAddTask={addTask}
+      />
+
+      {/* Shortcuts Guide Overlay Modal */}
+      <KeyboardShortcutsModal
+        isOpen={isShortcutsOpen}
+        onClose={() => setIsShortcutsOpen(false)}
+      />
+
+      {/* Global Hot Notification Toaster with Premium custom styles */}
+      <Toaster />
+
     </div>
   );
 }
