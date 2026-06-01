@@ -26,13 +26,13 @@ export default function AssigneeDropdown({ selected, onToggle }) {
           onClick={() => setOpen(o => !o)}
           aria-expanded={open}
           aria-haspopup="true"
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors duration-150 cursor-pointer whitespace-nowrap ${
+          className={`flex h-10 items-center gap-2 px-3.5 rounded-md border text-sm font-medium transition-colors duration-150 cursor-pointer whitespace-nowrap ${
             isActive
               ? 'bg-violet-500/15 border-violet-500/30 text-violet-300'
-              : 'bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-zinc-300'
+              : 'bg-[#15161b] hover:bg-[#1a1b21] border-[#24252b] text-zinc-300'
           }`}
         >
-          <User className="w-3 h-3 text-zinc-500" />
+          <User className="w-4 h-4 text-zinc-500" />
           {label}
           <ChevronDown className={`w-3 h-3 text-zinc-500 transition-transform ${open ? 'rotate-180' : ''}`} />
         </button>

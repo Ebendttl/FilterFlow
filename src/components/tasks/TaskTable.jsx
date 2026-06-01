@@ -5,13 +5,13 @@ import Skeleton from '../ui/Skeleton';
 import EmptyState from '../ui/EmptyState';
 
 const COLS = [
-  { key: null,        label: '',          cls: 'w-10 pl-4'    },
-  { key: 'title',     label: 'Task',      cls: 'min-w-[280px] flex-1' },
-  { key: 'status',    label: 'Status',    cls: 'w-[130px]'    },
-  { key: 'priority',  label: 'Priority',  cls: 'w-[110px]'    },
-  { key: null,        label: 'Project',   cls: 'w-[150px]'    },
-  { key: null,        label: 'Assignee',  cls: 'w-[160px]'    },
-  { key: 'dueDate',   label: 'Due Date',  cls: 'w-[120px]'    },
+  { key: null,        label: 'ID',        cls: 'w-[100px] pl-7' },
+  { key: 'title',     label: 'Title',     cls: 'min-w-[300px] flex-1' },
+  { key: null,        label: 'Project',   cls: 'w-[160px]' },
+  { key: 'status',    label: 'Status',    cls: 'w-[150px]' },
+  { key: 'priority',  label: 'Priority',  cls: 'w-[126px]' },
+  { key: 'dueDate',   label: 'Due Date',  cls: 'w-[150px]' },
+  { key: null,        label: 'Assignee',  cls: 'w-[230px]' },
   { key: null,        label: '',          cls: 'w-[52px]'     },
 ];
 
@@ -49,24 +49,27 @@ export default function TaskTable({
   };
 
   return (
-    <div className="flex-1 overflow-auto">
+    <div className="flex-1 overflow-auto px-0">
+      <div
+        className="flex h-12 items-center justify-between border-b px-7 text-sm"
+        style={{ borderColor: '#18191d', color: 'var(--text-muted)' }}
+      >
+        <span>
+          Showing {tasks.length} tasks {filters.projects?.length === 1 ? `in "${filters.projects[0]}"` : 'overall'}
+        </span>
+        <span className="hidden sm:inline">Sorted by Task ID (newest first)</span>
+      </div>
       <table className="w-full border-collapse">
-        <thead className="sticky top-0 z-10 bg-ff-elevated">
-          <tr className="h-10 border-b border-ff-border">
-            <th className="pl-4 pr-2 w-10 text-center">
-              <input
-                type="checkbox"
-                checked={allSelected}
-                onChange={onSelectAll}
-                className="w-4 h-4 rounded border-ff-border bg-ff-card text-ff-accent focus:ring-ff-accent focus:ring-offset-0 cursor-pointer"
-                aria-label="Select all tasks"
-              />
-            </th>
-            {COLS.slice(1).map((col, i) => (
+        <thead
+          className="sticky top-0 z-10 backdrop-blur-md"
+          style={{ background: 'rgba(7,8,13,0.88)' }}
+        >
+          <tr className="h-12 border-b" style={{ borderColor: '#18191d' }}>
+            {COLS.map((col, i) => (
               <th
                 key={i}
                 onClick={col.key ? () => onSetSort(col.key) : undefined}
-                className={`px-4 text-left text-[11px] uppercase tracking-wider text-ff-muted font-medium ${col.cls} ${col.key ? 'cursor-pointer hover:text-ff-secondary group select-none' : ''} transition-colors`}
+                className={`px-4 text-left text-[10px] uppercase tracking-[0.18em] text-ff-muted font-bold ${col.cls} ${col.key ? 'cursor-pointer hover:text-ff-secondary group select-none' : ''} transition-colors`}
               >
                 <div className="flex items-center gap-1">
                   <span className={filters.sortBy === col.key ? 'text-ff-secondary' : ''}>{col.label}</span>

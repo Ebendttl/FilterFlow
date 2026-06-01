@@ -59,63 +59,75 @@ export default function TaskTableRow({
     <>
       <tr
         ref={rowRef}
-        className={`h-12 border-b border-ff-border/50 group transition-colors duration-100 cursor-pointer relative ${
+        className={`h-[188px] border-b group transition-all duration-150 cursor-pointer relative ${
           isNew ? 'new-task-flash' : ''
-        } ${isSelected ? 'bg-ff-accent/5 border-l-2 border-l-ff-accent' : 'bg-ff-base hover:bg-ff-hover/60'}`}
+        } ${isSelected ? 'bg-ff-accent/10 border-l-2 border-l-ff-accent' : 'hover:bg-white/[0.018]'}`}
+        style={{ borderColor: '#17181c' }}
         onClick={() => onRowClick(task)}
         onMouseEnter={handleMouseEnterRow}
         onMouseLeave={handleMouseLeaveRow}
       >
-        {/* Checkbox */}
-        <td className="pl-4 pr-2 w-10" onClick={e => e.stopPropagation()}>
+        {/* ID */}
+        <td className="relative w-[100px] pl-7 pr-4" onClick={e => e.stopPropagation()}>
           <input
             type="checkbox"
             checked={isSelected}
             onChange={() => onSelect(task.id)}
-            className="w-4 h-4 rounded border-ff-border bg-ff-card text-ff-accent focus:ring-ff-accent focus:ring-offset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-100 cursor-pointer"
+            className="absolute left-2 top-1/2 w-4 h-4 -translate-y-1/2 rounded border-ff-border bg-ff-card text-ff-accent focus:ring-ff-accent focus:ring-offset-0 opacity-0 group-hover:opacity-50 transition-opacity duration-100 cursor-pointer"
             aria-label={`Select ${task.id}`}
           />
+          <span className="font-mono text-sm font-medium" style={{ color: 'var(--text-muted)' }}>{task.id}</span>
         </td>
 
         {/* Task title */}
-        <td className="px-4 min-w-[280px]">
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="font-mono text-[10px] text-ff-muted shrink-0">{task.id}</span>
-            <span className="text-[13.5px] font-medium text-ff-primary hover:text-ff-accent transition-colors truncate max-w-xs">
+        <td className="px-4 min-w-[300px]">
+          <div className="flex flex-col gap-2 min-w-0">
+            <span className={`text-[17px] leading-8 font-semibold hover:text-ff-accent transition-colors max-w-sm ${task.status === 'done' ? 'text-ff-muted line-through decoration-ff-muted/70' : 'text-ff-primary'}`}>
               {task.title}
             </span>
           </div>
         </td>
 
+        {/* Project */}
+        <td className="px-4 w-[160px]">
+          <div
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-md border"
+            style={{ background: projectPillBg(task.project), borderColor: projectPillBorder(task.project) }}
+          >
+            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${PROJECT_COLORS[task.project] || 'bg-zinc-500'}`} />
+            <span className="text-xs font-bold truncate" style={{ color: projectPillText(task.project) }}>{task.project}</span>
+          </div>
+        </td>
+
         {/* Status */}
-        <td className="px-4 w-[130px]">
+        <td className="px-4 w-[150px]">
           <StatusBadge status={task.status} />
         </td>
 
         {/* Priority */}
-        <td className="px-4 w-[110px]">
+        <td className="px-4 w-[120px]">
           <PriorityBadge priority={task.priority} />
         </td>
 
-        {/* Project */}
-        <td className="px-4 w-[150px]">
-          <div className="flex items-center gap-2">
-            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${PROJECT_COLORS[task.project] || 'bg-zinc-500'}`} />
-            <span className="text-xs text-ff-secondary truncate">{task.project}</span>
-          </div>
+        {/* Due date */}
+        <td className="px-4 w-[140px]">
+          <span className={`text-sm font-medium ${due.cls}`}>{due.text}</span>
         </td>
 
         {/* Assignee */}
-        <td className="px-4 w-[160px]">
-          <div className="flex items-center gap-2">
-            <Avatar initials={task.assignee.initials} color={task.assignee.color} name={task.assignee.name} size="xs" showTooltip />
-            <span className="text-xs text-ff-secondary truncate">{task.assignee.name}</span>
-          </div>
-        </td>
-
-        {/* Due date */}
-        <td className="px-4 w-[120px]">
-          <span className={`text-xs font-medium ${due.cls}`}>{due.text}</span>
+        <td className="px-4 w-[230px]">
+          {task.assignee?.name !== 'Unassigned' ? (
+            <Avatar
+              initials={task.assignee.initials}
+              color={task.assignee.color}
+              image={task.assignee.image}
+              name={task.assignee.name}
+              size="hero"
+              showTooltip
+            />
+          ) : (
+            <span className="text-sm italic" style={{ color: 'var(--text-muted)' }}>Unassigned</span>
+          )}
         </td>
 
         {/* Actions */}
@@ -151,4 +163,31 @@ export default function TaskTableRow({
       </AnimatePresence>
     </>
   );
+}
+
+function projectPillText(project) {
+  if (project === 'Core App') return '#bca7ff';
+  if (project === 'Vercel Deploy') return '#38bdf8';
+  if (project === 'Analytics Engine') return '#34d399';
+  if (project === 'Design System') return '#f472b6';
+  if (project === 'API Integration') return '#fbbf24';
+  return 'var(--text-secondary)';
+}
+
+function projectPillBg(project) {
+  if (project === 'Core App') return 'rgba(139,92,246,0.12)';
+  if (project === 'Vercel Deploy') return 'rgba(14,165,233,0.10)';
+  if (project === 'Analytics Engine') return 'rgba(16,185,129,0.10)';
+  if (project === 'Design System') return 'rgba(236,72,153,0.10)';
+  if (project === 'API Integration') return 'rgba(245,158,11,0.10)';
+  return 'rgba(255,255,255,0.025)';
+}
+
+function projectPillBorder(project) {
+  if (project === 'Core App') return 'rgba(139,92,246,0.25)';
+  if (project === 'Vercel Deploy') return 'rgba(14,165,233,0.25)';
+  if (project === 'Analytics Engine') return 'rgba(16,185,129,0.25)';
+  if (project === 'Design System') return 'rgba(236,72,153,0.25)';
+  if (project === 'API Integration') return 'rgba(245,158,11,0.25)';
+  return 'var(--glass-line)';
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, Check } from 'lucide-react';
+import { ChevronDown, Check, CircleDot } from 'lucide-react';
 import Dropdown from '../ui/Dropdown';
 
 const STATUS_OPTIONS = [
@@ -32,12 +32,13 @@ export default function StatusDropdown({ selected, onToggle }) {
           onClick={() => setOpen(o => !o)}
           aria-expanded={open}
           aria-haspopup="true"
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors duration-150 cursor-pointer whitespace-nowrap ${
+          className={`flex h-10 items-center gap-2 px-3.5 rounded-md border text-sm font-medium transition-colors duration-150 cursor-pointer whitespace-nowrap ${
             isActive
               ? 'bg-violet-500/15 border-violet-500/30 text-violet-300'
-              : 'bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-zinc-300'
+              : 'bg-[#15161b] hover:bg-[#1a1b21] border-[#24252b] text-zinc-300'
           }`}
         >
+          <CircleDot className="h-4 w-4 text-zinc-500" />
           {isActive && selected.length === 1 && (
             <span className={`w-1.5 h-1.5 rounded-full ${STATUS_OPTIONS.find(o=>o.value===selected[0])?.dot}`} />
           )}

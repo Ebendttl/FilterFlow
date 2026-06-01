@@ -26,14 +26,13 @@ export default function SortDropdown({ sortBy, sortDir, onSetSort }) {
           type="button"
           onClick={() => setOpen(o => !o)}
           aria-expanded={open}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors duration-150 cursor-pointer whitespace-nowrap ${
+          className={`flex h-9 items-center gap-1.5 rounded-lg text-sm font-medium transition-colors duration-150 cursor-pointer whitespace-nowrap ${
             sortBy
-              ? 'bg-violet-500/15 border-violet-500/30 text-violet-300'
-              : 'bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-zinc-400'
+              ? 'text-violet-300'
+              : 'text-zinc-500 hover:text-zinc-300'
           }`}
         >
-          <ArrowUpDown className="w-3 h-3" />
-          {activeLabel ? `${activeLabel} ${sortDir === 'asc' ? '↑' : '↓'}` : 'Sort'}
+          {activeLabel ? `Sorted by ${activeLabel} ${sortDir === 'asc' ? '↑' : '↓'}` : 'Sorted by Task ID (newest first)'}
         </button>
       }
     >

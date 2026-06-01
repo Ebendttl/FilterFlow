@@ -8,8 +8,8 @@ const SYSTEM_PROMPT = `You are a task filter assistant. The user describes what 
   "search": string or null,
   "statuses": array of: "todo"|"in_progress"|"in_review"|"done"|"blocked",
   "priorities": array of: "urgent"|"high"|"medium"|"low"|"none",
-  "assignees": array of names from: Sarah Chen, Marcus Okafor, Priya Patel, James Liu, Emma Rodriguez, David Kim,
-  "projects": array of: "Design System"|"Mobile App"|"Backend API"|"Marketing Site",
+  "assignees": array of names from: Joan Akinseinde, Maya Chen, Iris Morgan, Theo Banks, Nora Patel, Leo Okafor,
+  "projects": array of: "Core App"|"Vercel Deploy"|"Analytics Engine"|"Design System"|"API Integration",
   "dateRange": { "start": ISO date string or null, "end": ISO date string or null },
   "explanation": "a one-sentence plain-English explanation of what you filtered"
 }
@@ -79,8 +79,23 @@ export default function AICommandBar({ onFiltersApplied, commandBarRef }) {
   };
 
   return (
-    <div className="bg-zinc-900/60 backdrop-blur-sm border-b border-zinc-800 px-4 sm:px-6 py-2.5 flex items-center gap-3 shrink-0 ai-glow">
-      <Sparkles className={`w-4 h-4 text-cyan-400 shrink-0 ${loading ? 'animate-spin-slow' : ''}`} />
+    <div
+      className="backdrop-blur-sm border-b px-4 sm:px-6 py-3 flex items-center gap-3 shrink-0 ai-glow"
+      style={{
+        background: 'linear-gradient(90deg, rgba(34,211,238,0.075), rgba(155,92,255,0.04), rgba(255,255,255,0.018))',
+        borderColor: 'var(--glass-line)'
+      }}
+    >
+      <div
+        className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+        style={{
+          color: 'var(--accent-cyan)',
+          background: 'color-mix(in srgb, var(--accent-cyan) 12%, transparent)',
+          border: '1px solid color-mix(in srgb, var(--accent-cyan) 24%, transparent)'
+        }}
+      >
+        <Sparkles className={`w-4 h-4 ${loading ? 'animate-spin-slow' : ''}`} />
+      </div>
       <input
         ref={inputRef}
         type="text"
@@ -89,11 +104,11 @@ export default function AICommandBar({ onFiltersApplied, commandBarRef }) {
         onKeyDown={handleKeyDown}
         disabled={loading}
         placeholder='Ask AI to filter... e.g. "Show blocked urgent tasks assigned to Sarah"'
-        className="flex-1 bg-transparent border-none outline-none text-sm text-zinc-100 placeholder:text-zinc-600 font-sans disabled:opacity-60"
+        className="flex-1 bg-transparent border-none outline-none text-sm text-ff-primary placeholder:text-ff-muted font-sans disabled:opacity-60"
         aria-label="AI natural language filter"
       />
       {loading ? (
-        <span className="text-xs text-cyan-400 font-mono shrink-0 animate-pulse">Thinking...</span>
+        <span className="text-xs font-mono shrink-0 animate-pulse" style={{ color: 'var(--accent-cyan)' }}>Thinking...</span>
       ) : value.trim() ? (
         <button
           type="button"
@@ -104,7 +119,14 @@ export default function AICommandBar({ onFiltersApplied, commandBarRef }) {
           <ArrowRight className="w-3.5 h-3.5 text-cyan-400" />
         </button>
       ) : (
-        <span className="text-xs text-cyan-400 font-mono bg-cyan-500/10 border border-cyan-500/20 px-2 py-0.5 rounded shrink-0 hidden sm:inline">
+        <span
+          className="text-xs font-mono px-2 py-1 rounded-md shrink-0 hidden sm:inline border"
+          style={{
+            color: 'var(--accent-cyan)',
+            background: 'color-mix(in srgb, var(--accent-cyan) 10%, transparent)',
+            borderColor: 'color-mix(in srgb, var(--accent-cyan) 20%, transparent)'
+          }}
+        >
           AI Search
         </span>
       )}

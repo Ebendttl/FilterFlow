@@ -9,7 +9,10 @@ export default function MobileSidebarDrawer({
   onViewChange,
   onToggleAiPanel,
   onOpenSettings,
-  tasks
+  tasks,
+  filters,
+  toggleProject,
+  clearProjectFilter
 }) {
   return (
     <AnimatePresence>
@@ -38,6 +41,9 @@ export default function MobileSidebarDrawer({
               onToggleAiPanel={onToggleAiPanel}
               onOpenSettings={onOpenSettings}
               tasks={tasks}
+              filters={filters}
+              toggleProject={toggleProject}
+              clearProjectFilter={clearProjectFilter}
               isMobileDrawer={true}
               onCloseMobileDrawer={onClose}
             />

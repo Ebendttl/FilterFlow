@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { generateTasks } from '../data/tasks';
 
-let taskIdCounter = 49;
+let taskIdCounter = 116;
 
 function generateId() {
   return `FF-${String(taskIdCounter++).padStart(3, '0')}`;
@@ -19,8 +19,8 @@ export function useTaskStore() {
       title: taskData.title || 'Untitled Task',
       status: taskData.status || 'todo',
       priority: taskData.priority || 'medium',
-      project: taskData.project || 'Backend API',
-      assignee: taskData.assignee || { name: 'Alex Johnson', initials: 'AJ', color: 'bg-violet-600' },
+      project: taskData.project || 'Core App',
+      assignee: taskData.assignee || { name: 'Joan Akinseinde', initials: 'JA', color: 'bg-violet-600' },
       dueDate: taskData.dueDate || today,
       createdAt: today,
       tags: taskData.tags || [],

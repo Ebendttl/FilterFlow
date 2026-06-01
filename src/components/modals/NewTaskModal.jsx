@@ -13,8 +13,8 @@ export default function NewTaskModal({ isOpen, onClose, onAddTask }) {
   const [title, setTitle] = useState('');
   const [status, setStatus] = useState('todo');
   const [priority, setPriority] = useState('medium');
-  const [project, setProject] = useState('Backend API');
-  const [assigneeName, setAssigneeName] = useState('Alex Johnson');
+  const [project, setProject] = useState('Core App');
+  const [assigneeName, setAssigneeName] = useState('Joan Akinseinde');
   const [dueDate, setDueDate] = useState(new Date().toISOString().split('T')[0]);
   const [description, setDescription] = useState('');
   const [showError, setShowError] = useState(false);
@@ -30,12 +30,12 @@ export default function NewTaskModal({ isOpen, onClose, onAddTask }) {
   "title": string,
   "status": "todo"|"in_progress"|"in_review"|"done"|"blocked",
   "priority": "urgent"|"high"|"medium"|"low"|"none",
-  "project": "Design System"|"Mobile App"|"Backend API"|"Marketing Site",
-  "assigneeName": "Sarah Chen"|"Marcus Okafor"|"Priya Patel"|"James Liu"|"Emma Rodriguez"|"David Kim"|"Alex Johnson",
+  "project": "Core App"|"Vercel Deploy"|"Analytics Engine"|"Design System"|"API Integration",
+  "assigneeName": "Joan Akinseinde"|"Maya Chen"|"Iris Morgan"|"Theo Banks"|"Nora Patel"|"Leo Okafor",
   "dueDate": "ISO date string (YYYY-MM-DD)",
   "description": string
 }
-If not mentioned, use reasonable defaults (status: todo, priority: medium, project: Backend API, assigneeName: Alex Johnson, dueDate: ${new Date().toISOString().split('T')[0]}).
+If not mentioned, use reasonable defaults (status: todo, priority: medium, project: Core App, assigneeName: Joan Akinseinde, dueDate: ${new Date().toISOString().split('T')[0]}).
 Return ONLY the JSON. No markdown. No wrap.`;
 
       const response = await callClaude(systemPrompt, promptText, [], 400);
@@ -78,8 +78,8 @@ Return ONLY the JSON. No markdown. No wrap.`;
 
     // Find the assignee object
     const selectedAssignee = TEAM_MEMBERS.find(m => m.name === assigneeName) || {
-      name: 'Alex Johnson',
-      initials: 'AJ',
+      name: 'Joan Akinseinde',
+      initials: 'JA',
       color: 'bg-violet-600'
     };
 
@@ -101,8 +101,8 @@ Return ONLY the JSON. No markdown. No wrap.`;
     setTitle('');
     setStatus('todo');
     setPriority('medium');
-    setProject('Backend API');
-    setAssigneeName('Alex Johnson');
+    setProject('Core App');
+    setAssigneeName('Joan Akinseinde');
     setDueDate(new Date().toISOString().split('T')[0]);
     setDescription('');
     setShowError(false);
@@ -160,7 +160,7 @@ Return ONLY the JSON. No markdown. No wrap.`;
                   <textarea
                     value={quickPrompt}
                     onChange={e => setQuickPrompt(e.target.value)}
-                    placeholder="Describe your task... e.g. 'Setup stripe webhooks, high priority, assign to Sarah Chen'"
+                    placeholder="Describe your task... e.g. 'Setup edge middleware, high priority, assign to Joan'"
                     rows={2}
                     className="w-full bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-200 p-3 outline-none resize-none focus:border-cyan-500/35 focus:ring-1 focus:ring-cyan-500/10 placeholder:text-zinc-700 font-sans"
                   />
@@ -274,7 +274,6 @@ Return ONLY the JSON. No markdown. No wrap.`;
                       onChange={e => setAssigneeName(e.target.value)}
                       className="w-full bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-300 px-3 py-2.5 outline-none cursor-pointer focus:border-violet-500/40"
                     >
-                      <option value="Alex Johnson">Alex Johnson</option>
                       {TEAM_MEMBERS.map(m => (
                         <option key={m.name} value={m.name}>{m.name}</option>
                       ))}

@@ -97,7 +97,7 @@ export default function App() {
 
   // ── Derived data ────────────────────────────────────────────
   const displayedTasks = activeView === 'my-tasks'
-    ? filteredTasks.filter(t => t.assignee?.name === 'Alex Johnson')
+    ? filteredTasks.filter(t => t.assignee?.name === 'Joan Akinseinde')
     : filteredTasks;
 
   // ── Selection helpers ───────────────────────────────────────
@@ -126,23 +126,17 @@ export default function App() {
 
   return (
     <div
-      className="flex h-screen w-screen overflow-hidden font-sans antialiased"
+      className="flex h-screen w-screen overflow-hidden font-sans antialiased relative"
       style={{ background: 'var(--bg-base)', color: 'var(--text-primary)' }}
     >
-      {/* Subtle dot grid overlay */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-[0.18]"
-        style={{
-          backgroundImage: 'radial-gradient(var(--bg-border) 1px, transparent 1px)',
-          backgroundSize: '24px 24px',
-        }}
-      />
-
       {/* ── Desktop Sidebar ────────────────────────────────── */}
-      <div className="hidden md:block w-64 h-full shrink-0 relative z-10">
+      <div className="hidden md:block w-[286px] h-full shrink-0 relative z-10">
         <Sidebar
           activeView={activeView}
           onViewChange={setActiveView}
+          filters={filters}
+          toggleProject={toggleProject}
+          clearProjectFilter={() => clearFilter('projects')}
           onToggleAiPanel={() => setIsAiPanelOpen(o => !o)}
           onOpenSettings={() => toast('Settings coming soon', toastStyle)}
           tasks={tasks}
@@ -156,6 +150,9 @@ export default function App() {
           onClose={() => setIsSidebarOpen(false)}
           activeView={activeView}
           onViewChange={setActiveView}
+          filters={filters}
+          toggleProject={toggleProject}
+          clearProjectFilter={() => clearFilter('projects')}
           onToggleAiPanel={() => setIsAiPanelOpen(o => !o)}
           onOpenSettings={() => toast('Settings coming soon', toastStyle)}
           tasks={tasks}
@@ -164,6 +161,7 @@ export default function App() {
 
       {/* ── Main workspace ─────────────────────────────────── */}
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden relative z-10">
+        <div className="flex flex-col min-w-0 h-full overflow-hidden">
 
         <TopNav
           searchValue={filters.search}
@@ -178,7 +176,7 @@ export default function App() {
         />
 
         {/* Filter bars — only for task list views */}
-        {showFilters && (
+        {false && showFilters && (
           <AICommandBar
             onFiltersApplied={setAllFilters}
             commandBarRef={commandBarRef}
@@ -186,6 +184,9 @@ export default function App() {
         )}
         {showFilters && (
           <FilterToolbar
+            searchValue={filters.search}
+            onSearchChange={setSearch}
+            onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
             filters={filters}
             toggleStatus={toggleStatus}
             togglePriority={togglePriority}
@@ -195,7 +196,7 @@ export default function App() {
             setSort={setSort}
           />
         )}
-        {showFilters && (
+        {false && showFilters && (
           <ActiveFilterBar
             filters={filters}
             activeFilterCount={activeFilterCount}
@@ -272,6 +273,7 @@ export default function App() {
             toggleTheme={toggleTheme}
           />
         </main>
+        </div>
       </div>
 
       {/* ── AI Chat Panel ──────────────────────────────────── */}

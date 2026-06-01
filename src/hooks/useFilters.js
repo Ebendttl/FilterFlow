@@ -104,7 +104,7 @@ export function useFilters(tasks) {
 
     // Assignees
     if (filters.assignees.length > 0) {
-      result = result.filter(t => filters.assignees.includes(t.assignee.name));
+      result = result.filter(t => t.assignee && filters.assignees.includes(t.assignee.name));
     }
 
     // Projects

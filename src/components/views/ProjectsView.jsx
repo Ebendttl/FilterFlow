@@ -5,11 +5,10 @@ import StatusBadge from '../ui/StatusBadge';
 import PriorityBadge from '../ui/PriorityBadge';
 import Avatar from '../ui/Avatar';
 import { formatDueDate, PROJECT_COLORS } from '../tasks/taskUtils';
-
-const PROJECTS_LIST = ['Design System', 'Mobile App', 'Backend API', 'Marketing Site'];
+import { PROJECTS } from '../../data/tasks';
 
 export default function ProjectsView({ tasks, onTaskClick }) {
-  const [expandedProj, setExpandedProj] = useState(PROJECTS_LIST[0]);
+  const [expandedProj, setExpandedProj] = useState(PROJECTS[0]);
 
   return (
     <div className="flex-1 flex flex-col min-h-0 bg-surface-0 overflow-y-auto p-6 space-y-6 select-none">
@@ -24,7 +23,7 @@ export default function ProjectsView({ tasks, onTaskClick }) {
 
       {/* Grid of Projects */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 shrink-0">
-        {PROJECTS_LIST.map(proj => {
+        {PROJECTS.map(proj => {
           const projTasks = tasks.filter(t => t.project === proj);
           const doneTasks = projTasks.filter(t => t.status === 'done');
           const blockedTasks = projTasks.filter(t => t.status === 'blocked');
@@ -127,7 +126,7 @@ export default function ProjectsView({ tasks, onTaskClick }) {
                     <div className="flex items-center gap-3 shrink-0 select-none">
                       <StatusBadge status={task.status} />
                       <PriorityBadge priority={task.priority} />
-                      <Avatar initials={task.assignee.initials} color={task.assignee.color} size="xs" />
+                      <Avatar initials={task.assignee.initials} color={task.assignee.color} image={task.assignee.image} size="xs" />
                       <span className={`text-[10px] font-semibold ${due.cls} min-w-[50px] text-right`}>
                         {due.text}
                       </span>
