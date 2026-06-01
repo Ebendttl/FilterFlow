@@ -100,7 +100,7 @@ export default function DateRangePicker({ value, onChange }) {
           type="button"
           onClick={() => setOpen(o => !o)}
           aria-expanded={open}
-          className={`flex h-9 items-center gap-2 px-3.5 rounded-md border text-sm font-medium transition-colors duration-150 cursor-pointer whitespace-nowrap ${
+          className={`flex h-9 w-full items-center gap-2 px-3.5 rounded-md border text-sm font-medium transition-colors duration-150 cursor-pointer whitespace-nowrap sm:w-auto ${
             value.start
               ? 'bg-violet-500/15 border-violet-500/30 text-violet-300'
               : 'bg-[#15161b] hover:bg-[#1a1b21] border-[#24252b] text-zinc-300'

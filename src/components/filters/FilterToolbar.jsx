@@ -24,22 +24,22 @@ export default function FilterToolbar({
 
   return (
     <div
-      className="border-b px-4 py-4 sm:px-7 shrink-0"
+      className="border-b px-3 py-3 sm:px-5 lg:px-7 shrink-0"
       style={{
         background: '#09090d',
         borderColor: '#1f1f24'
       }}
     >
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-3">
-          <div className="relative w-[362px] max-w-full shrink">
-            <Search className="pointer-events-none absolute left-[18px] top-1/2 h-6 w-6 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
+      <div className="flex flex-col items-stretch gap-3 xl:flex-row xl:items-start xl:justify-between">
+        <div className="grid min-w-0 flex-1 grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:gap-3">
+          <div className="relative col-span-2 w-full sm:w-[340px] lg:w-[362px] sm:max-w-full sm:shrink">
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 sm:left-[18px] sm:h-6 sm:w-6" style={{ color: 'var(--text-muted)' }} />
             <input
               type="text"
               value={searchValue}
               onChange={e => onSearchChange(e.target.value)}
               placeholder="Search tasks..."
-              className="h-10 w-full rounded-md border pl-[46px] pr-[58px] text-[15px] outline-none transition-colors"
+              className="h-10 w-full rounded-md border pl-10 pr-[58px] text-sm outline-none transition-colors sm:pl-[46px] sm:text-[15px]"
               style={{
                 background: '#15161b',
                 borderColor: '#24252b',
@@ -61,11 +61,11 @@ export default function FilterToolbar({
           <AssigneeDropdown selected={filters.assignees} onToggle={toggleAssignee} />
         </div>
 
-        <div className="hidden shrink-0 items-center gap-2 xl:flex">
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:shrink-0 sm:items-center">
           <button
             type="button"
             onClick={setAssignedToMe}
-            className="flex h-9 items-center gap-2 rounded-full border px-3.5 text-sm font-medium"
+            className="flex h-9 items-center justify-center gap-2 rounded-full border px-3 text-xs font-medium sm:px-3.5 sm:text-sm"
             style={{
               color: isAssignedToMe ? 'var(--accent)' : 'var(--text-secondary)',
               background: isAssignedToMe ? 'rgba(155,92,255,0.08)' : '#0c0c10',
@@ -78,7 +78,7 @@ export default function FilterToolbar({
           <button
             type="button"
             onClick={setOverdue}
-            className="flex h-9 items-center gap-2 rounded-full border px-3.5 text-sm font-medium"
+            className="flex h-9 items-center justify-center gap-2 rounded-full border px-3 text-xs font-medium sm:px-3.5 sm:text-sm"
             style={{ color: 'var(--text-secondary)', background: '#0c0c10', borderColor: '#28282f' }}
           >
             <Clock className="h-4 w-4" />
@@ -87,7 +87,7 @@ export default function FilterToolbar({
         </div>
       </div>
 
-      <div className="mt-3 flex items-center justify-between gap-4">
+      <div className="mt-2 flex items-center justify-between gap-4 sm:mt-3">
         <div className="flex min-w-0 items-center gap-3">
           <DateRangePicker value={filters.dateRange} onChange={setDateRange} />
         </div>

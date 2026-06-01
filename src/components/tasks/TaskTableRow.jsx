@@ -59,7 +59,7 @@ export default function TaskTableRow({
     <>
       <tr
         ref={rowRef}
-        className={`h-[188px] border-b group transition-all duration-150 cursor-pointer relative ${
+        className={`h-[142px] xl:h-[156px] border-b group transition-all duration-150 cursor-pointer relative ${
           isNew ? 'new-task-flash' : ''
         } ${isSelected ? 'bg-ff-accent/10 border-l-2 border-l-ff-accent' : 'hover:bg-white/[0.018]'}`}
         style={{ borderColor: '#17181c' }}
@@ -68,7 +68,7 @@ export default function TaskTableRow({
         onMouseLeave={handleMouseLeaveRow}
       >
         {/* ID */}
-        <td className="relative w-[100px] pl-7 pr-4" onClick={e => e.stopPropagation()}>
+        <td className="relative w-[82px] pl-5 pr-3" onClick={e => e.stopPropagation()}>
           <input
             type="checkbox"
             checked={isSelected}
@@ -80,16 +80,16 @@ export default function TaskTableRow({
         </td>
 
         {/* Task title */}
-        <td className="px-4 min-w-[300px]">
+        <td className="px-4 min-w-[280px]">
           <div className="flex flex-col gap-2 min-w-0">
-            <span className={`text-[17px] leading-8 font-semibold hover:text-ff-accent transition-colors max-w-sm ${task.status === 'done' ? 'text-ff-muted line-through decoration-ff-muted/70' : 'text-ff-primary'}`}>
+            <span className={`max-w-[320px] text-[15px] leading-7 font-semibold hover:text-ff-accent transition-colors xl:text-[16px] ${task.status === 'done' ? 'text-ff-muted line-through decoration-ff-muted/70' : 'text-ff-primary'}`}>
               {task.title}
             </span>
           </div>
         </td>
 
         {/* Project */}
-        <td className="px-4 w-[160px]">
+        <td className="px-4 w-[148px]">
           <div
             className="inline-flex items-center gap-2 px-3 py-1 rounded-md border"
             style={{ background: projectPillBg(task.project), borderColor: projectPillBorder(task.project) }}
@@ -100,22 +100,22 @@ export default function TaskTableRow({
         </td>
 
         {/* Status */}
-        <td className="px-4 w-[150px]">
+        <td className="px-4 w-[138px]">
           <StatusBadge status={task.status} />
         </td>
 
         {/* Priority */}
-        <td className="px-4 w-[120px]">
+        <td className="px-4 w-[116px]">
           <PriorityBadge priority={task.priority} />
         </td>
 
         {/* Due date */}
-        <td className="px-4 w-[140px]">
+        <td className="px-4 w-[112px]">
           <span className={`text-sm font-medium ${due.cls}`}>{due.text}</span>
         </td>
 
         {/* Assignee */}
-        <td className="px-4 w-[230px]">
+        <td className="px-4 w-[132px]">
           {task.assignee?.name !== 'Unassigned' ? (
             <Avatar
               initials={task.assignee.initials}
@@ -131,7 +131,7 @@ export default function TaskTableRow({
         </td>
 
         {/* Actions */}
-        <td className="px-3 w-[52px] text-right" onClick={e => e.stopPropagation()}>
+        <td className="px-2 w-[40px] text-right" onClick={e => e.stopPropagation()}>
           <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-100">
             <TaskContextMenu
               task={task}

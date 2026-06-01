@@ -5,14 +5,14 @@ import Skeleton from '../ui/Skeleton';
 import EmptyState from '../ui/EmptyState';
 
 const COLS = [
-  { key: null,        label: 'ID',        cls: 'w-[100px] pl-7' },
-  { key: 'title',     label: 'Title',     cls: 'min-w-[300px] flex-1' },
-  { key: null,        label: 'Project',   cls: 'w-[160px]' },
-  { key: 'status',    label: 'Status',    cls: 'w-[150px]' },
-  { key: 'priority',  label: 'Priority',  cls: 'w-[126px]' },
-  { key: 'dueDate',   label: 'Due Date',  cls: 'w-[150px]' },
-  { key: null,        label: 'Assignee',  cls: 'w-[230px]' },
-  { key: null,        label: '',          cls: 'w-[52px]'     },
+  { key: null,        label: 'ID',        cls: 'w-[82px] pl-5' },
+  { key: 'title',     label: 'Title',     cls: 'min-w-[280px] flex-1' },
+  { key: null,        label: 'Project',   cls: 'w-[148px]' },
+  { key: 'status',    label: 'Status',    cls: 'w-[138px]' },
+  { key: 'priority',  label: 'Priority',  cls: 'w-[116px]' },
+  { key: 'dueDate',   label: 'Due Date',  cls: 'w-[112px]' },
+  { key: null,        label: 'Assignee',  cls: 'w-[132px]' },
+  { key: null,        label: '',          cls: 'w-[40px]' },
 ];
 
 export default function TaskTable({
@@ -38,8 +38,6 @@ export default function TaskTable({
     <EmptyState onClearFilters={clearAllFilters} onAskAI={onAskAI} />
   );
 
-  const allSelected = tasks.length > 0 && selectedIds.length === tasks.length;
-
   const SortIcon = ({ col }) => {
     if (!col) return null;
     if (filters.sortBy !== col) return <ChevronUp className="w-3 h-3 text-ff-muted group-hover:text-ff-secondary transition-colors" />;
@@ -49,7 +47,7 @@ export default function TaskTable({
   };
 
   return (
-    <div className="flex-1 overflow-auto px-0">
+    <div className="flex-1 overflow-x-auto overflow-y-auto px-0">
       <div
         className="flex h-12 items-center justify-between border-b px-7 text-sm"
         style={{ borderColor: '#18191d', color: 'var(--text-muted)' }}
@@ -59,7 +57,7 @@ export default function TaskTable({
         </span>
         <span className="hidden sm:inline">Sorted by Task ID (newest first)</span>
       </div>
-      <table className="w-full border-collapse">
+      <table className="w-full min-w-[1048px] border-collapse xl:min-w-0">
         <thead
           className="sticky top-0 z-10 backdrop-blur-md"
           style={{ background: 'rgba(7,8,13,0.88)' }}

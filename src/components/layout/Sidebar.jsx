@@ -79,12 +79,7 @@ export default function Sidebar({
     >
       <div className="flex h-[86px] shrink-0 items-center justify-between border-b px-6" style={{ borderColor: '#222228' }}>
         <div className="flex min-w-0 items-center gap-3">
-          <div
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
-            style={{ background: 'linear-gradient(180deg, #7c3aed, #5b21b6)' }}
-          >
-            <Layers3 className="h-[18px] w-[18px] text-white" strokeWidth={2.1} />
-          </div>
+          <FilterFlowIcon className="h-8 w-8" />
           <div className="min-w-0">
             <div className="text-xs font-semibold leading-none" style={{ color: 'var(--text-muted)' }}>
               Workspace
@@ -205,5 +200,19 @@ export default function Sidebar({
         </div>
       </div>
     </aside>
+  );
+}
+
+function FilterFlowIcon({ className = '' }) {
+  return (
+    <div
+      className={`flex shrink-0 items-center justify-center rounded-lg ${className}`}
+      style={{ background: 'linear-gradient(180deg, #7c3aed, #5b21b6)' }}
+    >
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <path d="M4 2H14V6H8V9H12V13H8V18H4Z" fill="white" />
+        <path d="M10 5H18V9H13V12H16V15H13V18H10Z" fill="white" fillOpacity="0.58" />
+      </svg>
+    </div>
   );
 }

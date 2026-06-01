@@ -1,7 +1,7 @@
 import React from 'react';
-import { Sun, Moon } from 'lucide-react';
+import { Sun, Moon, Sparkles } from 'lucide-react';
 
-export default function Footer({ tasks = [], isDark = true, toggleTheme }) {
+export default function Footer({ tasks = [], isDark = true, toggleTheme, onOpenGuide }) {
   const total     = tasks.length;
   const done      = tasks.filter(t => t.status === 'done').length;
   const blocked   = tasks.filter(t => t.status === 'blocked').length;
@@ -15,10 +15,10 @@ export default function Footer({ tasks = [], isDark = true, toggleTheme }) {
         borderColor:  'var(--bg-border)',
       }}
     >
-      <div className="flex items-center justify-between px-5 py-2.5 gap-4 flex-wrap">
+      <div className="flex items-center justify-between gap-3 px-3 py-2.5 sm:px-5">
 
         {/* ── Left: branding + live status ── */}
-        <div className="flex items-center gap-3 min-w-0">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           {/* Logo mark */}
           <svg width="16" height="16" viewBox="0 0 20 20" fill="none" className="shrink-0">
             <path d="M4 2H14V6H8V9H12V13H8V18H4Z" fill="var(--accent)" />
@@ -40,18 +40,18 @@ export default function Footer({ tasks = [], isDark = true, toggleTheme }) {
             v2.1
           </span>
 
-          <span style={{ color: 'var(--bg-border)' }}>·</span>
+          <span className="hidden sm:inline" style={{ color: 'var(--bg-border)' }}>·</span>
 
           {/* Live pulse */}
-          <div className="flex items-center gap-1.5">
+          <div className="hidden items-center gap-1.5 sm:flex">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
             <span className="text-[11px] font-medium" style={{ color: 'var(--text-muted)' }}>Live</span>
           </div>
 
-          <span style={{ color: 'var(--bg-border)' }}>·</span>
+          <span className="hidden md:inline" style={{ color: 'var(--bg-border)' }}>·</span>
 
           {/* Task stats */}
-          <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>
+          <span className="hidden text-[11px] md:inline" style={{ color: 'var(--text-muted)' }}>
             <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{total}</span> tasks
             &nbsp;·&nbsp;
             <span className="text-emerald-500 font-semibold">{done}</span> done
@@ -67,7 +67,7 @@ export default function Footer({ tasks = [], isDark = true, toggleTheme }) {
         </div>
 
         {/* ── Right: dark/light toggle + credit ── */}
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <span
             className="text-[11px] hidden sm:inline"
             style={{ color: 'var(--text-muted)' }}
@@ -76,6 +76,20 @@ export default function Footer({ tasks = [], isDark = true, toggleTheme }) {
           </span>
 
           <span className="hidden sm:block w-px h-3" style={{ background: 'var(--bg-border)' }} />
+
+          <button
+            type="button"
+            onClick={onOpenGuide}
+            className="hidden items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-[11px] font-semibold transition-colors hover:border-violet-500/40 sm:flex"
+            style={{
+              background: 'var(--bg-card)',
+              borderColor: 'var(--bg-border)',
+              color: 'var(--text-secondary)',
+            }}
+          >
+            <Sparkles size={12} style={{ color: 'var(--accent)' }} />
+            Guide
+          </button>
 
           {/* ── The visible, labeled Dark / Light toggle ── */}
           <button

@@ -5,8 +5,8 @@ export default function Avatar({ initials = 'AJ', color = 'bg-violet-600', name 
     xs: 'w-6 h-6 text-[9px]',
     sm: 'w-8 h-8 text-[10px]',
     md: 'w-9 h-9 text-[11px]',
-    lg: 'w-12 h-12 text-xs',
-    hero: 'w-[128px] h-[128px] text-xl'
+    lg: 'w-11 h-11 text-xs',
+    hero: 'w-20 h-20 xl:w-24 xl:h-24 text-lg'
   };
   return (
     <div className="relative group inline-flex shrink-0">

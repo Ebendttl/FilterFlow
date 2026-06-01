@@ -3,6 +3,7 @@ import { Menu, Sparkles } from 'lucide-react';
 
 export default function TopNav({
   onOpenSidebarDrawer,
+  onOpenGuide,
   tasks = []
 }) {
   return (
@@ -30,12 +31,18 @@ export default function TopNav({
           <Menu size={18} />
         </button>
 
-        <div className="flex-1 min-w-0" />
+        <div className="flex min-w-0 flex-1 items-center gap-2">
+          <FilterFlowMark />
+          <div className="min-w-0">
+            <div className="truncate text-sm font-bold leading-none text-white">FilterFlow</div>
+            <div className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.16em]" style={{ color: 'var(--text-muted)' }}>Workspace</div>
+          </div>
+        </div>
 
         {/* Zone C — actions, shrink-0 */}
         <div className="shrink-0 flex items-center gap-1">
 
-          <ProductionBadge />
+          <ProductionBadge onClick={onOpenGuide} />
         </div>
       </div>
 
@@ -68,17 +75,19 @@ export default function TopNav({
         {/* Spacer */}
         <div className="flex-1" />
 
-        <ProductionBadge />
+        <ProductionBadge onClick={onOpenGuide} />
       </div>
 
     </header>
   );
 }
 
-function ProductionBadge() {
+function ProductionBadge({ onClick }) {
   return (
-    <div
-      className="flex h-8 items-center gap-1.5 rounded-md border px-3 text-xs font-medium"
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex h-8 items-center gap-1.5 rounded-md border px-2.5 text-xs font-medium transition-colors hover:border-violet-500/40 sm:px-3"
       style={{
         color: 'var(--text-muted)',
         borderColor: '#23232a',
@@ -86,7 +95,19 @@ function ProductionBadge() {
       }}
     >
       <Sparkles className="h-3.5 w-3.5" style={{ color: 'var(--accent)' }} />
-      Production Mode
+      <span className="hidden min-[390px]:inline">Production Mode</span>
+      <span className="min-[390px]:hidden">Guide</span>
+    </button>
+  );
+}
+
+function FilterFlowMark() {
+  return (
+    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg" style={{ background: 'linear-gradient(180deg, #7c3aed, #5b21b6)' }}>
+      <svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <path d="M4 2H14V6H8V9H12V13H8V18H4Z" fill="white" />
+        <path d="M10 5H18V9H13V12H16V15H13V18H10Z" fill="white" fillOpacity="0.58" />
+      </svg>
     </div>
   );
 }

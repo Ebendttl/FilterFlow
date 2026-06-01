@@ -18,31 +18,39 @@ export default function TaskMobileList({ tasks, onRowClick, clearAllFilters, onA
   }
 
   return (
-    <div className="flex-1 overflow-y-auto">
+    <div className="flex-1 overflow-y-auto px-3 py-3">
       {tasks.map(task => {
         const due = formatDueDate(task.dueDate);
         return (
           <div
             key={task.id}
             onClick={() => onRowClick(task)}
-            className="px-4 py-3 border-b border-zinc-800 hover:bg-zinc-900 transition-colors cursor-pointer"
+            className="mb-3 rounded-xl border p-3.5 transition-colors cursor-pointer"
+            style={{ background: '#0c0c11', borderColor: '#202127' }}
           >
-            <div className="flex items-center gap-2 mb-1.5">
-              <span className="font-mono text-[10px] text-zinc-600">{task.id}</span>
+            <div className="mb-3 flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="mb-2 flex items-center gap-2">
+                  <span className="font-mono text-[10px] text-zinc-600">{task.id}</span>
+                  <span className={`w-1.5 h-1.5 rounded-full ${PROJECT_COLORS[task.project]}`} />
+                  <span className="truncate text-xs text-zinc-500">{task.project}</span>
+                </div>
+                <p className="text-[15px] font-semibold leading-6 text-zinc-100 line-clamp-2">{task.title}</p>
+              </div>
+              {task.assignee?.name !== 'Unassigned' && (
+                <Avatar
+                  initials={task.assignee.initials}
+                  color={task.assignee.color}
+                  image={task.assignee.image}
+                  size="lg"
+                />
+              )}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
               <StatusBadge status={task.status} />
               <PriorityBadge priority={task.priority} />
-            </div>
-            <p className="text-sm font-medium text-zinc-100 line-clamp-2 mb-2">{task.title}</p>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Avatar initials={task.assignee.initials} color={task.assignee.color} size="xs" />
-                <span className="text-xs text-zinc-500">{task.assignee.name}</span>
-              </div>
               <span className={`text-xs ${due.cls}`}>{due.text}</span>
-            </div>
-            <div className="flex items-center gap-1.5 mt-2">
-              <span className={`w-1.5 h-1.5 rounded-full ${PROJECT_COLORS[task.project]}`} />
-              <span className="text-xs text-zinc-500">{task.project}</span>
             </div>
           </div>
         );

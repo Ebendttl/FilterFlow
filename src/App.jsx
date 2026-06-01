@@ -6,11 +6,8 @@ import Sidebar              from './components/layout/Sidebar';
 import TopNav               from './components/layout/TopNav';
 import AIChatPanel          from './components/layout/AIChatPanel';
 import Footer               from './components/layout/Footer';
-
-// Mobile drawer — graceful fallback if component doesn't exist
-let MobileSidebarDrawer;
-try { MobileSidebarDrawer = require('./components/layout/MobileSidebarDrawer').default; }
-catch { MobileSidebarDrawer = null; }
+import MobileSidebarDrawer  from './components/layout/MobileSidebarDrawer';
+import ProductGuide         from './components/layout/ProductGuide';
 
 // Filters
 import AICommandBar   from './components/filters/AICommandBar';
@@ -26,11 +23,7 @@ import ProjectsView   from './components/views/ProjectsView';
 import SprintsView    from './components/views/SprintsView';
 import ReportsView    from './components/views/ReportsView';
 import InsightsView   from './components/views/InsightsView';
-
-// Mobile list — graceful fallback
-let TaskMobileList;
-try { TaskMobileList = require('./components/tasks/TaskMobileList').default; }
-catch { TaskMobileList = null; }
+import TaskMobileList from './components/tasks/TaskMobileList';
 
 // Overlays / Modals
 import TaskDetailSheet       from './components/tasks/TaskDetailSheet';
@@ -73,6 +66,11 @@ export default function App() {
   const [isNewTaskOpen,         setIsNewTaskOpen]          = useState(false);
   const [isShortcutsOpen,       setIsShortcutsOpen]       = useState(false);
   const [isCommandPaletteOpen,  setIsCommandPaletteOpen]  = useState(false);
+  const [isGuideOpen,           setIsGuideOpen]           = useState(false);
+
+  useEffect(() => {
+    if (!localStorage.getItem('ff-product-guide-v2-seen')) setIsGuideOpen(true);
+  }, []);
 
   // ── Global Keyboard Shortcuts ───────────────────────────────
   useKeyboard({
@@ -126,11 +124,11 @@ export default function App() {
 
   return (
     <div
-      className="flex h-screen w-screen overflow-hidden font-sans antialiased relative"
+      className="flex h-dvh w-screen overflow-hidden font-sans antialiased relative"
       style={{ background: 'var(--bg-base)', color: 'var(--text-primary)' }}
     >
       {/* ── Desktop Sidebar ────────────────────────────────── */}
-      <div className="hidden md:block w-[286px] h-full shrink-0 relative z-10">
+      <div className="hidden md:block md:w-[252px] xl:w-[286px] h-full shrink-0 relative z-10">
         <Sidebar
           activeView={activeView}
           onViewChange={setActiveView}
@@ -144,20 +142,18 @@ export default function App() {
       </div>
 
       {/* ── Mobile Drawer ──────────────────────────────────── */}
-      {MobileSidebarDrawer && (
-        <MobileSidebarDrawer
-          isOpen={isSidebarOpen}
-          onClose={() => setIsSidebarOpen(false)}
-          activeView={activeView}
-          onViewChange={setActiveView}
-          filters={filters}
-          toggleProject={toggleProject}
-          clearProjectFilter={() => clearFilter('projects')}
-          onToggleAiPanel={() => setIsAiPanelOpen(o => !o)}
-          onOpenSettings={() => toast('Settings coming soon', toastStyle)}
-          tasks={tasks}
-        />
-      )}
+      <MobileSidebarDrawer
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        activeView={activeView}
+        onViewChange={setActiveView}
+        filters={filters}
+        toggleProject={toggleProject}
+        clearProjectFilter={() => clearFilter('projects')}
+        onToggleAiPanel={() => setIsAiPanelOpen(o => !o)}
+        onOpenSettings={() => toast('Settings coming soon', toastStyle)}
+        tasks={tasks}
+      />
 
       {/* ── Main workspace ─────────────────────────────────── */}
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden relative z-10">
@@ -169,6 +165,7 @@ export default function App() {
           onOpenSidebarDrawer={() => setIsSidebarOpen(true)}
           onOpenNewTaskModal={() => setIsNewTaskOpen(true)}
           onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+          onOpenGuide={() => setIsGuideOpen(true)}
           searchInputRef={searchInputRef}
           isDark={isDark}
           toggleTheme={toggleTheme}
@@ -234,7 +231,7 @@ export default function App() {
               return <InsightsView tasks={tasks} />;
 
             // Default: all-tasks / my-tasks list
-            if (isMobile && TaskMobileList) {
+            if (isMobile) {
               return (
                 <TaskMobileList
                   tasks={displayedTasks}
@@ -271,6 +268,7 @@ export default function App() {
             tasks={tasks}
             isDark={isDark}
             toggleTheme={toggleTheme}
+            onOpenGuide={() => setIsGuideOpen(true)}
           />
         </main>
         </div>
@@ -326,6 +324,17 @@ export default function App() {
         clearAllFilters={clearAllFilters}
         setTheme={setTheme}
         onOpenShortcuts={() => setIsShortcutsOpen(true)}
+      />
+
+      <ProductGuide
+        isOpen={isGuideOpen}
+        onClose={() => {
+          localStorage.setItem('ff-product-guide-v2-seen', 'true');
+          setIsGuideOpen(false);
+        }}
+        onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+        onOpenNewTask={() => setIsNewTaskOpen(true)}
+        onAskAI={() => setIsAiPanelOpen(true)}
       />
 
       {/* ── Toaster ────────────────────────────────────────── */}
