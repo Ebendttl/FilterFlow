@@ -11,7 +11,7 @@ export function formatDueDate(dateStr) {
 
 export const PROJECT_COLORS = {
   'Core App':          'bg-violet-500',
-  'Vercel Deploy':     'bg-sky-500',
+  'Render Deploy':     'bg-sky-500',
   'Analytics Engine':  'bg-emerald-500',
   'Design System':     'bg-pink-500',
   'API Integration':   'bg-amber-500',

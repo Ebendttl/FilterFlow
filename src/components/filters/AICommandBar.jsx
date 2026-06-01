@@ -9,7 +9,7 @@ const SYSTEM_PROMPT = `You are a task filter assistant. The user describes what 
   "statuses": array of: "todo"|"in_progress"|"in_review"|"done"|"blocked",
   "priorities": array of: "urgent"|"high"|"medium"|"low"|"none",
   "assignees": array of names from: Joan Akinseinde, Maya Chen, Iris Morgan, Theo Banks, Nora Patel, Leo Okafor,
-  "projects": array of: "Core App"|"Vercel Deploy"|"Analytics Engine"|"Design System"|"API Integration",
+  "projects": array of: "Core App"|"Render Deploy"|"Analytics Engine"|"Design System"|"API Integration",
   "dateRange": { "start": ISO date string or null, "end": ISO date string or null },
   "explanation": "a one-sentence plain-English explanation of what you filtered"
 }

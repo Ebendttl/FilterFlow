@@ -167,7 +167,7 @@ export default function TaskTableRow({
 
 function projectPillText(project) {
   if (project === 'Core App') return '#bca7ff';
-  if (project === 'Vercel Deploy') return '#38bdf8';
+  if (project === 'Render Deploy') return '#38bdf8';
   if (project === 'Analytics Engine') return '#34d399';
   if (project === 'Design System') return '#f472b6';
   if (project === 'API Integration') return '#fbbf24';
@@ -176,7 +176,7 @@ function projectPillText(project) {
 
 function projectPillBg(project) {
   if (project === 'Core App') return 'rgba(139,92,246,0.12)';
-  if (project === 'Vercel Deploy') return 'rgba(14,165,233,0.10)';
+  if (project === 'Render Deploy') return 'rgba(14,165,233,0.10)';
   if (project === 'Analytics Engine') return 'rgba(16,185,129,0.10)';
   if (project === 'Design System') return 'rgba(236,72,153,0.10)';
   if (project === 'API Integration') return 'rgba(245,158,11,0.10)';
@@ -185,7 +185,7 @@ function projectPillBg(project) {
 
 function projectPillBorder(project) {
   if (project === 'Core App') return 'rgba(139,92,246,0.25)';
-  if (project === 'Vercel Deploy') return 'rgba(14,165,233,0.25)';
+  if (project === 'Render Deploy') return 'rgba(14,165,233,0.25)';
   if (project === 'Analytics Engine') return 'rgba(16,185,129,0.25)';
   if (project === 'Design System') return 'rgba(236,72,153,0.25)';
   if (project === 'API Integration') return 'rgba(245,158,11,0.25)';

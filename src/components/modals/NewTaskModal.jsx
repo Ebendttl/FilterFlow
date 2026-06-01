@@ -30,7 +30,7 @@ export default function NewTaskModal({ isOpen, onClose, onAddTask }) {
   "title": string,
   "status": "todo"|"in_progress"|"in_review"|"done"|"blocked",
   "priority": "urgent"|"high"|"medium"|"low"|"none",
-  "project": "Core App"|"Vercel Deploy"|"Analytics Engine"|"Design System"|"API Integration",
+  "project": "Core App"|"Render Deploy"|"Analytics Engine"|"Design System"|"API Integration",
   "assigneeName": "Joan Akinseinde"|"Maya Chen"|"Iris Morgan"|"Theo Banks"|"Nora Patel"|"Leo Okafor",
   "dueDate": "ISO date string (YYYY-MM-DD)",
   "description": string
