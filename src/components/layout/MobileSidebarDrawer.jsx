@@ -33,7 +33,7 @@ export default function MobileSidebarDrawer({
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ type: 'spring', stiffness: 320, damping: 30 }}
-            className="fixed top-0 left-0 w-[280px] h-full z-50 md:hidden bg-zinc-950 flex flex-col border-r border-zinc-800"
+            className="fixed top-0 left-0 h-full w-[min(88vw,300px)] z-50 md:hidden bg-zinc-950 flex flex-col border-r border-zinc-800"
           >
             <Sidebar
               activeView={activeView}
