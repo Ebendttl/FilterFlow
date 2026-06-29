@@ -228,8 +228,8 @@ export default function ProductGuide({
                           setIndex(i => i + 1);
                         }
                       }}
-                      className="flex h-10 flex-1 items-center justify-center gap-2 rounded-lg px-4 text-sm font-bold text-white sm:flex-none"
-                      style={{ background: 'linear-gradient(135deg, var(--accent), #7dd3fc)' }}
+                      className="flex h-10 flex-1 items-center justify-center gap-2 rounded-lg px-4 text-sm font-bold text-white sm:flex-none transition-colors hover:brightness-110 active:brightness-95"
+                      style={{ background: 'var(--accent)' }}
                     >
                       {isLast ? 'Create first task' : 'Continue'}
                       <ArrowRight className="h-4 w-4" />
